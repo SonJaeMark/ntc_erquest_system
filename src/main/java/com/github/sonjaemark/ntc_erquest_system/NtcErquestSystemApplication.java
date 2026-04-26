@@ -76,4 +76,6 @@ public class NtcErquestSystemApplication {
 
 		};
 	}
+
+	// branch rule test
 }
