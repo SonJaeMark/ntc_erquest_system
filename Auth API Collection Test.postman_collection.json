@@ -1,0 +1,783 @@
+{
+  "info": {
+    "_postman_id": "a6f8db8e-5b1a-4e1a-bf88-ntc-erquest-auth",
+    "name": "Auth API Collection Test",
+    "description": "Collection for testing login, refresh token, and logout flows against the seeded users created in NtcErquestSystemApplication. Each login request includes the user email and password directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "registrar1AccessToken",
+      "value": ""
+    },
+    {
+      "key": "registrar1RefreshToken",
+      "value": ""
+    },
+    {
+      "key": "registrar2AccessToken",
+      "value": ""
+    },
+    {
+      "key": "registrar2RefreshToken",
+      "value": ""
+    },
+    {
+      "key": "student1AccessToken",
+      "value": ""
+    },
+    {
+      "key": "student1RefreshToken",
+      "value": ""
+    },
+    {
+      "key": "student2AccessToken",
+      "value": ""
+    },
+    {
+      "key": "student2RefreshToken",
+      "value": ""
+    },
+    {
+      "key": "student3AccessToken",
+      "value": ""
+    },
+    {
+      "key": "student3RefreshToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "role",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Registrar 1",
+      "description": "Credentials: registrar1@email.com / password123",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"registrar1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('registrar1AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('registrar1RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar1RefreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh token returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('registrar1AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('registrar1RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar1RefreshToken}}\",\n  \"accessToken\": \"{{registrar1AccessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Logout clears tokens in response', function () {",
+                  "  pm.expect(body.accessToken).to.be.null;",
+                  "  pm.expect(body.refreshToken).to.be.null;",
+                  "  pm.expect(body.userId).to.be.null;",
+                  "  pm.expect(body.email).to.be.null;",
+                  "  pm.expect(body.role).to.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Registrar 2",
+      "description": "Credentials: registrar2@email.com / password123",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"registrar2@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('registrar2AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('registrar2RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar2RefreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh token returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('registrar2AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('registrar2RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar2RefreshToken}}\",\n  \"accessToken\": \"{{registrar2AccessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Logout clears tokens in response', function () {",
+                  "  pm.expect(body.accessToken).to.be.null;",
+                  "  pm.expect(body.refreshToken).to.be.null;",
+                  "  pm.expect(body.userId).to.be.null;",
+                  "  pm.expect(body.email).to.be.null;",
+                  "  pm.expect(body.role).to.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Student 1",
+      "description": "Credentials: student1@email.com / password123",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('student1AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('student1RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student1RefreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh token returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('student1AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('student1RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student1RefreshToken}}\",\n  \"accessToken\": \"{{student1AccessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Logout clears tokens in response', function () {",
+                  "  pm.expect(body.accessToken).to.be.null;",
+                  "  pm.expect(body.refreshToken).to.be.null;",
+                  "  pm.expect(body.userId).to.be.null;",
+                  "  pm.expect(body.email).to.be.null;",
+                  "  pm.expect(body.role).to.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Student 2",
+      "description": "Credentials: student2@email.com / password123",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student2@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('student2AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('student2RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student2RefreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh token returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('student2AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('student2RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student2RefreshToken}}\",\n  \"accessToken\": \"{{student2AccessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Logout clears tokens in response', function () {",
+                  "  pm.expect(body.accessToken).to.be.null;",
+                  "  pm.expect(body.refreshToken).to.be.null;",
+                  "  pm.expect(body.userId).to.be.null;",
+                  "  pm.expect(body.email).to.be.null;",
+                  "  pm.expect(body.role).to.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Student 3",
+      "description": "Credentials: student3@email.com / password123",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student3@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('student3AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('student3RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student3RefreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh token returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('student3AccessToken', body.accessToken);",
+                  "pm.collectionVariables.set('student3RefreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('userId', body.userId);",
+                  "pm.collectionVariables.set('email', body.email);",
+                  "pm.collectionVariables.set('role', body.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student3RefreshToken}}\",\n  \"accessToken\": \"{{student3AccessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout returns 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Logout clears tokens in response', function () {",
+                  "  pm.expect(body.accessToken).to.be.null;",
+                  "  pm.expect(body.refreshToken).to.be.null;",
+                  "  pm.expect(body.userId).to.be.null;",
+                  "  pm.expect(body.email).to.be.null;",
+                  "  pm.expect(body.role).to.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
