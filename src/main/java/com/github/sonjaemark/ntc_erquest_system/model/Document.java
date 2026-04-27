@@ -1,6 +1,6 @@
 package com.github.sonjaemark.ntc_erquest_system.model;
 
-
+import java.time.LocalDateTime;
 
 import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
 
@@ -13,32 +13,38 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Entity
-@Table(name = "document_request_item")
+@Table(name = "document_table")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class DocumentRequestItem {
-    
+public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private LocalDateTime uploadedAt;
+
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
 
-    private int quantity;
-    private int copies;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_request_id", nullable = false)
-    private DocumentRequest documentRequest;
+    @JoinColumn(name = "student_id")
+    private UserModel student;
 
+    private String documentContent;
+
+    @PrePersist
+    void onCreate() {
+        this.uploadedAt = LocalDateTime.now();
+    }
 }

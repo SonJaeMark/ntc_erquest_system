@@ -1,38 +1,53 @@
 package com.github.sonjaemark.ntc_erquest_system.controller;
 
-import org.springframework.http.HttpStatus;
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestDTO;
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.service.document.ConcreteDocumentRequestService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.github.sonjaemark.ntc_erquest_system.dto.CreateDocumentRequestDTO;
-import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
-import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
-import com.github.sonjaemark.ntc_erquest_system.service.document.DocumentRequestService;
-
-import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/student/document-requests")
+@RequestMapping("/api/document-request")
 public class DocumentRequestController {
-    private final DocumentRequestService documentRequestService;
 
-    public DocumentRequestController(DocumentRequestService documentRequestService) {
-        this.documentRequestService = documentRequestService;
+    private final ConcreteDocumentRequestService documentService;
+
+    public DocumentRequestController(ConcreteDocumentRequestService documentService) {
+        this.documentService = documentService;
     }
 
-    @PostMapping
-    public ResponseEntity<DocumentRequestResponseDTO> submitRequest(@Valid @RequestBody CreateDocumentRequestDTO request) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(documentRequestService.submitRequest(request));
+    @PostMapping("/submit")
+    public ResponseEntity<DocumentResponseDTO> submit(@RequestBody DocumentRequestDTO dto) {
+        documentService.setDocumentRequestDTO(dto);
+        return ResponseEntity.ok(documentService.submit());
     }
 
-    @GetMapping("/document-types")
-    public ResponseEntity<DocumentType[]> getDocumentTypes() {
-        return ResponseEntity.ok(DocumentType.values());
+    @PutMapping("/process")
+    public ResponseEntity<DocumentResponseDTO> process(@RequestBody DocumentRequestDTO dto) {
+        documentService.setDocumentRequestDTO(dto);
+        return ResponseEntity.ok(documentService.process());
+    }
+
+    @PutMapping("/accept")
+    public ResponseEntity<DocumentResponseDTO> accept(@RequestBody DocumentRequestDTO dto) {
+        documentService.setDocumentRequestDTO(dto);
+        return ResponseEntity.ok(documentService.accept());
+    }
+
+    @GetMapping("/student/{id}")
+    public ResponseEntity<List<DocumentResponseDTO>> getByStudent(@PathVariable Long id) {
+        return ResponseEntity.ok(documentService.getAllByStudentId(id));
+    }
+
+    @GetMapping("/registrar/{id}")
+    public ResponseEntity<List<DocumentResponseDTO>> getByRegistrar(@PathVariable Long id) {
+        return ResponseEntity.ok(documentService.getAllByRegistrarId(id));
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<DocumentResponseDTO>> getUnaccepted() {
+        return ResponseEntity.ok(documentService.getAllUnacceptedRequest());
     }
 }

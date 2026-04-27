@@ -3,11 +3,13 @@ package com.github.sonjaemark.ntc_erquest_system.service.auth;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import com.github.sonjaemark.ntc_erquest_system.exception.UnauthorizedUserException;
 import com.github.sonjaemark.ntc_erquest_system.model.UserModel;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 
+@Service
 public class CurrentUser {
     private final UserModelRepository userModelRepository;  
 

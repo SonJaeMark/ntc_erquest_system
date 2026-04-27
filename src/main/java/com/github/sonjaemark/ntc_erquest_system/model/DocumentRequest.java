@@ -1,12 +1,11 @@
 package com.github.sonjaemark.ntc_erquest_system.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
+import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.Purpose;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -26,7 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "document_requests")
+@Table(name = "document_requests_table")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,32 +36,39 @@ public class DocumentRequest {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String requestReference;
+    @Enumerated(EnumType.STRING)
+    private Purpose purpose; // fixed purpose also can be added in the future
 
-    private String purpose;
+    private String additionalDetails; // to be filled by student
 
-    private String remarks;
+    private String remarks; // remarks of Registrar
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
+    
+    @Enumerated(EnumType.STRING)
+    private DocumentType documentType;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id", nullable = false)
+    private Document document; 
 
     private LocalDateTime requestedAt;
-
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private UserModel student;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "documentRequest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DocumentRequestItem> items = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UserModel registrar;
 
     @PrePersist
     void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         this.requestedAt = now;
         this.updatedAt = now;
+        this.status = RequestStatus.PENDING;
     }
 
     @PreUpdate

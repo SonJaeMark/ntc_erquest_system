@@ -25,13 +25,16 @@ public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
 
-    String email;
-    String password;
+    private String email;
+    private String password;
+
+    private String firstName;
+    private String lastName;
 
     @Enumerated(EnumType.STRING)
-    UserRole role;
+    private UserRole role;
     
-    boolean isActive;
+    private boolean isActive;
 }
