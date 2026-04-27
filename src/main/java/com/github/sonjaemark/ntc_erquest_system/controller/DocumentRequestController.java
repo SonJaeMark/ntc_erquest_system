@@ -1,8 +1,10 @@
 package com.github.sonjaemark.ntc_erquest_system.controller;
 
-import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestDTO;
-import com.github.sonjaemark.ntc_erquest_system.dto.DocumentResponseDTO;
-import com.github.sonjaemark.ntc_erquest_system.service.document.ConcreteDocumentRequestService;
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.service.document.AbstractDocumentRequestService;
+import com.github.sonjaemark.ntc_erquest_system.service.document.IDocumentRequestQueryService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,42 +14,44 @@ import java.util.List;
 @RequestMapping("/api/document-request")
 public class DocumentRequestController {
 
-    private final ConcreteDocumentRequestService documentService;
+    private final AbstractDocumentRequestService documentService;
+    private final IDocumentRequestQueryService documentQueryService;
 
-    public DocumentRequestController(ConcreteDocumentRequestService documentService) {
+    public DocumentRequestController(AbstractDocumentRequestService documentService, IDocumentRequestQueryService documentQueryService) {
         this.documentService = documentService;
+        this.documentQueryService = documentQueryService;
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<DocumentResponseDTO> submit(@RequestBody DocumentRequestDTO dto) {
+    public ResponseEntity<DocumentRequestResponseDTO> submit(@RequestBody DocumentRequestRequestDTO dto) {
         documentService.setDocumentRequestDTO(dto);
         return ResponseEntity.ok(documentService.submit());
     }
 
     @PutMapping("/process")
-    public ResponseEntity<DocumentResponseDTO> process(@RequestBody DocumentRequestDTO dto) {
+    public ResponseEntity<DocumentRequestResponseDTO> process(@RequestBody DocumentRequestRequestDTO dto) {
         documentService.setDocumentRequestDTO(dto);
         return ResponseEntity.ok(documentService.process());
     }
 
     @PutMapping("/accept")
-    public ResponseEntity<DocumentResponseDTO> accept(@RequestBody DocumentRequestDTO dto) {
+    public ResponseEntity<DocumentRequestResponseDTO> accept(@RequestBody DocumentRequestRequestDTO dto) {
         documentService.setDocumentRequestDTO(dto);
         return ResponseEntity.ok(documentService.accept());
     }
 
-    @GetMapping("/student/{id}")
-    public ResponseEntity<List<DocumentResponseDTO>> getByStudent(@PathVariable Long id) {
-        return ResponseEntity.ok(documentService.getAllByStudentId(id));
+    @GetMapping("/student")
+    public ResponseEntity<List<DocumentRequestResponseDTO>> getByStudent() {
+        return ResponseEntity.ok(documentQueryService.getAllDocumentRequestByStudentId());
     }
 
-    @GetMapping("/registrar/{id}")
-    public ResponseEntity<List<DocumentResponseDTO>> getByRegistrar(@PathVariable Long id) {
-        return ResponseEntity.ok(documentService.getAllByRegistrarId(id));
+    @GetMapping("/registrar")
+    public ResponseEntity<List<DocumentRequestResponseDTO>> getByRegistrar() {
+        return ResponseEntity.ok(documentQueryService.getAllAceptedRequestByRegistrarId());
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<List<DocumentResponseDTO>> getUnaccepted() {
-        return ResponseEntity.ok(documentService.getAllUnacceptedRequest());
+    public ResponseEntity<List<DocumentRequestResponseDTO>> getUnaccepted() {
+        return ResponseEntity.ok(documentQueryService.getAllUnacceptedRequest());
     }
 }

@@ -106,6 +106,20 @@ public class GlobalExceptionHandler {
             );
     }
 
+    // DocumentNotFoundException
+    @ExceptionHandler(DocumentNotFoundException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleDocumentNotFound(DocumentNotFoundException ex) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                new ExceptionResponseDTO(
+                    HttpStatus.NOT_FOUND, 
+                    ex.getMessage(), 
+                    LocalDateTime.now()
+                )
+            );
+    }
+
     // DTO validation
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleBodyValidation(MethodArgumentNotValidException ex) {
