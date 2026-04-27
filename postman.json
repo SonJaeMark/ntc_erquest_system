@@ -1,0 +1,959 @@
+{
+  "info": {
+    "_postman_id": "8f5d3d5a-9f34-4f3b-8d2d-ntc-erquest-system",
+    "name": "ntc_erquest_system",
+    "description": "Postman collection for the NTC ERQuest System. Run the login requests first so the per-user accessToken and refreshToken variables are populated. Note: the current document-request implementation always persists new requests as PENDING and does not expose a dedicated reject/release endpoint, so the flow requests below are organized to match the available API routes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "student1_email",
+      "value": "student1@email.com"
+    },
+    {
+      "key": "student1_password",
+      "value": "password123"
+    },
+    {
+      "key": "student1_userId",
+      "value": ""
+    },
+    {
+      "key": "student1_accessToken",
+      "value": ""
+    },
+    {
+      "key": "student1_refreshToken",
+      "value": ""
+    },
+    {
+      "key": "student2_email",
+      "value": "student2@email.com"
+    },
+    {
+      "key": "student2_password",
+      "value": "password123"
+    },
+    {
+      "key": "student2_userId",
+      "value": ""
+    },
+    {
+      "key": "student2_accessToken",
+      "value": ""
+    },
+    {
+      "key": "student2_refreshToken",
+      "value": ""
+    },
+    {
+      "key": "student3_email",
+      "value": "student3@email.com"
+    },
+    {
+      "key": "student3_password",
+      "value": "password123"
+    },
+    {
+      "key": "student3_userId",
+      "value": ""
+    },
+    {
+      "key": "student3_accessToken",
+      "value": ""
+    },
+    {
+      "key": "student3_refreshToken",
+      "value": ""
+    },
+    {
+      "key": "registrar1_email",
+      "value": "registrar1@email.com"
+    },
+    {
+      "key": "registrar1_password",
+      "value": "password123"
+    },
+    {
+      "key": "registrar1_userId",
+      "value": ""
+    },
+    {
+      "key": "registrar1_accessToken",
+      "value": ""
+    },
+    {
+      "key": "registrar1_refreshToken",
+      "value": ""
+    },
+    {
+      "key": "registrar2_email",
+      "value": "registrar2@email.com"
+    },
+    {
+      "key": "registrar2_password",
+      "value": "password123"
+    },
+    {
+      "key": "registrar2_userId",
+      "value": ""
+    },
+    {
+      "key": "registrar2_accessToken",
+      "value": ""
+    },
+    {
+      "key": "registrar2_refreshToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Student 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{student1_email}}\",\n  \"password\": \"{{student1_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('student1_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('student1_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('student1_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Student 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{student2_email}}\",\n  \"password\": \"{{student2_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('student2_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('student2_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('student2_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Student 3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{student3_email}}\",\n  \"password\": \"{{student3_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('student3_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('student3_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('student3_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Registrar 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{registrar1_email}}\",\n  \"password\": \"{{registrar1_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('registrar1_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('registrar1_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('registrar1_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Registrar 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{registrar2_email}}\",\n  \"password\": \"{{registrar2_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('registrar2_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('registrar2_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('registrar2_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh - Student 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student1_refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('student1_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('student1_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('student1_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh - Student 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student2_refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('student2_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('student2_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('student2_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh - Student 3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student3_refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('student3_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('student3_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('student3_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh - Registrar 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar1_refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('registrar1_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('registrar1_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('registrar1_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh - Registrar 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar2_refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('registrar2_accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('registrar2_refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('registrar2_userId', String(json.userId));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout - Student 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student1_refreshToken}}\",\n  \"accessToken\": \"{{student1_accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout - Student 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student2_refreshToken}}\",\n  \"accessToken\": \"{{student2_accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout - Student 3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student3_refreshToken}}\",\n  \"accessToken\": \"{{student3_accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout - Registrar 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar1_refreshToken}}\",\n  \"accessToken\": \"{{registrar1_accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout - Registrar 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar2_refreshToken}}\",\n  \"accessToken\": \"{{registrar2_accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Submit Document - Student 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student1_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Requesting document for internship requirements.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "submit"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Request Docs - Student 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student1_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/student/{{student1_userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "student",
+                "{{student1_userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Request Docs - Student 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student2_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/student/{{student2_userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "student",
+                "{{student2_userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Request Docs - Student 3",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student3_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/student/{{student3_userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "student",
+                "{{student3_userId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrars",
+      "item": [
+        {
+          "name": "Get All Unaccepted Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar1_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "pending"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Accept Request - Registrar 1",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar1_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Accepted by registrar.\",\n  \"remarks\": \"Initial acceptance.\",\n  \"status\": \"PROCESSING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "accept"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Process Request -> READY_FOR_RELEASE",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar1_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Processing toward ready for release.\",\n  \"remarks\": \"Document is ready for release.\",\n  \"status\": \"READY_FOR_RELEASE\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "process"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Process Request -> REJECTED",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar1_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Rejected request example.\",\n  \"remarks\": \"Rejected due to incomplete requirements.\",\n  \"status\": \"REJECTED\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "process"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Process Request -> RELEASED",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar1_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Release example.\",\n  \"remarks\": \"Released to student.\",\n  \"status\": \"RELEASED\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "process"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Request Docs - Registrar 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar1_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/registrar/{{registrar1_userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "registrar",
+                "{{registrar1_userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Request Docs - Registrar 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar2_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/registrar/{{registrar2_userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "registrar",
+                "{{registrar2_userId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
