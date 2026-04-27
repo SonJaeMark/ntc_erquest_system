@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "8f5d3d5a-9f34-4f3b-8d2d-ntc-erquest-system",
     "name": "ntc_erquest_system",
-    "description": "Postman collection for the NTC ERQuest System. Run the login requests first so the per-user accessToken and refreshToken variables are populated. Note: the current document-request implementation always persists new requests as PENDING and does not expose a dedicated reject/release endpoint, so the flow requests below are organized to match the available API routes.",
+    "description": "Postman collection for the NTC ERQuest System. Run login requests first so each user's accessToken and refreshToken variables are populated before executing protected endpoints and end-to-end flow scenarios.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -31,6 +31,10 @@
       "value": ""
     },
     {
+      "key": "student1_docId",
+      "value": "1"
+    },
+    {
       "key": "student2_email",
       "value": "student2@email.com"
     },
@@ -51,6 +55,10 @@
       "value": ""
     },
     {
+      "key": "student2_docId",
+      "value": "8"
+    },
+    {
       "key": "student3_email",
       "value": "student3@email.com"
     },
@@ -69,6 +77,10 @@
     {
       "key": "student3_refreshToken",
       "value": ""
+    },
+    {
+      "key": "student3_docId",
+      "value": "15"
     },
     {
       "key": "registrar1_email",
@@ -108,6 +120,18 @@
     },
     {
       "key": "registrar2_refreshToken",
+      "value": ""
+    },
+    {
+      "key": "flow_student1_requestId",
+      "value": ""
+    },
+    {
+      "key": "flow_student2_requestId",
+      "value": ""
+    },
+    {
+      "key": "flow_student3_requestId",
       "value": ""
     }
   ],
@@ -666,7 +690,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Requesting document for internship requirements.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Requesting document for internship requirements.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/document-request/submit",
@@ -677,6 +701,179 @@
                 "api",
                 "document-request",
                 "submit"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('flow_student1_requestId', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Document - Student 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student2_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"SCHOLARSHIP\",\n  \"documentType\": \"CERTIFICATE_OF_ENROLLMENT\",\n  \"documentId\": {{student2_docId}},\n  \"additionalDetails\": \"Requesting COE for scholarship application.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student2_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "submit"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('flow_student2_requestId', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Document - Student 3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student3_accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"TRANSFERRING_SCHOOL\",\n  \"documentType\": \"GOOD_MORAL\",\n  \"documentId\": {{student3_docId}},\n  \"additionalDetails\": \"Requesting Good Moral for transfer application.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student3_userId}},\n  \"registrarId\": {{registrar2_userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/document-request/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document-request",
+                "submit"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('flow_student3_requestId', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Docs of Student - Student 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student1_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document/student",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document",
+                "student"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Docs of Student - Student 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student2_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document/student",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document",
+                "student"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Docs of Student - Student 3",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student3_accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/document/student",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "document",
+                "student"
               ]
             }
           }
@@ -692,15 +889,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/document-request/student/{{student1_userId}}",
+              "raw": "{{baseUrl}}/api/document-request/student",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "document-request",
-                "student",
-                "{{student1_userId}}"
+                "student"
               ]
             }
           }
@@ -716,15 +912,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/document-request/student/{{student2_userId}}",
+              "raw": "{{baseUrl}}/api/document-request/student",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "document-request",
-                "student",
-                "{{student2_userId}}"
+                "student"
               ]
             }
           }
@@ -740,15 +935,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/document-request/student/{{student3_userId}}",
+              "raw": "{{baseUrl}}/api/document-request/student",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "document-request",
-                "student",
-                "{{student3_userId}}"
+                "student"
               ]
             }
           }
@@ -797,7 +991,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Accepted by registrar.\",\n  \"remarks\": \"Initial acceptance.\",\n  \"status\": \"PROCESSING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Accepted by registrar.\",\n  \"remarks\": \"Initial acceptance.\",\n  \"status\": \"PROCESSING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/document-request/accept",
@@ -828,7 +1022,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Processing toward ready for release.\",\n  \"remarks\": \"Document is ready for release.\",\n  \"status\": \"READY_FOR_RELEASE\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Processing toward ready for release.\",\n  \"remarks\": \"Document is ready for release.\",\n  \"status\": \"READY_FOR_RELEASE\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/document-request/process",
@@ -859,7 +1053,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Rejected request example.\",\n  \"remarks\": \"Rejected due to incomplete requirements.\",\n  \"status\": \"REJECTED\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Rejected request example.\",\n  \"remarks\": \"Rejected due to incomplete requirements.\",\n  \"status\": \"REJECTED\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/document-request/process",
@@ -890,7 +1084,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purpose\": \"WORK\",\n  \"additionalDetails\": \"Release example.\",\n  \"remarks\": \"Released to student.\",\n  \"status\": \"RELEASED\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+              "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Release example.\",\n  \"remarks\": \"Released to student.\",\n  \"status\": \"RELEASED\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/document-request/process",
@@ -916,15 +1110,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/document-request/registrar/{{registrar1_userId}}",
+              "raw": "{{baseUrl}}/api/document-request/registrar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "document-request",
-                "registrar",
-                "{{registrar1_userId}}"
+                "registrar"
               ]
             }
           }
@@ -940,18 +1133,353 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/document-request/registrar/{{registrar2_userId}}",
+              "raw": "{{baseUrl}}/api/document-request/registrar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "document-request",
-                "registrar",
-                "{{registrar2_userId}}"
+                "registrar"
               ]
             }
           }
+        }
+      ]
+    },
+    {
+      "name": "Flows",
+      "item": [
+        {
+          "name": "Flow 1 - Student Requesting Document",
+          "item": [
+            {
+              "name": "1. Login - Student 1",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{student1_email}}\",\n  \"password\": \"{{student1_password}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "pm.collectionVariables.set('student1_accessToken', json.accessToken);",
+                      "pm.collectionVariables.set('student1_refreshToken', json.refreshToken);",
+                      "pm.collectionVariables.set('student1_userId', String(json.userId));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "2. Submit Request - Student 1",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{student1_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Student flow request for TOR.\",\n  \"remarks\": \"Flow test\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/submit",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "submit"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json && json.id) {",
+                      "  pm.collectionVariables.set('flow_student1_requestId', String(json.id));",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Flow 2 - Registrar Accept and Set READY_FOR_RELEASE",
+          "item": [
+            {
+              "name": "1. Login - Registrar 1",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{registrar1_email}}\",\n  \"password\": \"{{registrar1_password}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "pm.collectionVariables.set('registrar1_accessToken', json.accessToken);",
+                      "pm.collectionVariables.set('registrar1_refreshToken', json.refreshToken);",
+                      "pm.collectionVariables.set('registrar1_userId', String(json.userId));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "2. Accept Request - Registrar 1",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{registrar1_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Accepted in flow testing.\",\n  \"remarks\": \"Accepted\",\n  \"status\": \"PROCESSING\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/accept",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "accept"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "3. Process Request -> READY_FOR_RELEASE",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{registrar1_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"WORK\",\n  \"documentType\": \"TOR\",\n  \"documentId\": {{student1_docId}},\n  \"additionalDetails\": \"Set to ready for release.\",\n  \"remarks\": \"Ready\",\n  \"status\": \"READY_FOR_RELEASE\",\n  \"studentId\": {{student1_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/process",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "process"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flow 3 - Rejected",
+          "item": [
+            {
+              "name": "1. Submit Request - Student 2",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{student2_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"SCHOLARSHIP\",\n  \"documentType\": \"CERTIFICATE_OF_ENROLLMENT\",\n  \"documentId\": {{student2_docId}},\n  \"additionalDetails\": \"Submit for rejected flow.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student2_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/submit",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "submit"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "2. Process Request -> REJECTED",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{registrar1_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"SCHOLARSHIP\",\n  \"documentType\": \"CERTIFICATE_OF_ENROLLMENT\",\n  \"documentId\": {{student2_docId}},\n  \"additionalDetails\": \"Rejected flow processing.\",\n  \"remarks\": \"Missing requirements\",\n  \"status\": \"REJECTED\",\n  \"studentId\": {{student2_userId}},\n  \"registrarId\": {{registrar1_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/process",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "process"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flow 4 - Released",
+          "item": [
+            {
+              "name": "1. Submit Request - Student 3",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{student3_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"TRANSFERRING_SCHOOL\",\n  \"documentType\": \"GOOD_MORAL\",\n  \"documentId\": {{student3_docId}},\n  \"additionalDetails\": \"Submit for released flow.\",\n  \"remarks\": \"\",\n  \"status\": \"PENDING\",\n  \"studentId\": {{student3_userId}},\n  \"registrarId\": {{registrar2_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/submit",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "submit"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "2. Process Request -> RELEASED",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{registrar2_accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"purpose\": \"TRANSFERRING_SCHOOL\",\n  \"documentType\": \"GOOD_MORAL\",\n  \"documentId\": {{student3_docId}},\n  \"additionalDetails\": \"Released flow processing.\",\n  \"remarks\": \"Released\",\n  \"status\": \"RELEASED\",\n  \"studentId\": {{student3_userId}},\n  \"registrarId\": {{registrar2_userId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/document-request/process",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "document-request",
+                    "process"
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     }
