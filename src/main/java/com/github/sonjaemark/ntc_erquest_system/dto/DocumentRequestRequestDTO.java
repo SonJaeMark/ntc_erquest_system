@@ -5,12 +5,20 @@ import com.github.sonjaemark.ntc_erquest_system.model.enums.Purpose;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 
 public record DocumentRequestRequestDTO(
+    @NotNull(message = "Purpose is required")
     Purpose purpose,
+    @NotNull(message = "Document type is required")
     DocumentType documentType, // Added
+    @NotNull(message = "Document ID is required")
     Long documentId,           // Added to link the specific Document entity
+    @Size(max = 500, message = "Additional details must not exceed 500 characters")
     String additionalDetails,
+    @Size(max = 255, message = "Remarks must not exceed 255 characters")
     String remarks,
+    @NotNull(message = "Status is required")
     RequestStatus status,
+    @NotNull(message = "Student ID is required")
     Long studentId,
+    @NotNull(message = "Registrar ID is required")
     Long registrarId
 ) {}
