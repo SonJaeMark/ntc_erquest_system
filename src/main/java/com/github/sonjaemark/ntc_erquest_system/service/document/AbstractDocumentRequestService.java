@@ -10,6 +10,7 @@ import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthLevel;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
+import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequestLogsService;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,20 +22,23 @@ public abstract class AbstractDocumentRequestService extends AuthLevel{
     private DocumentRequestRequestDTO documentRequestDTO;
     protected final UserModelRepository userModelRepository;
     protected final DocumentRepository documentRepository;
+    protected final AbstractRequestLogsService requestLogsService;
 
     // Constructor for sub-classes to pass the repository up
     protected AbstractDocumentRequestService(
         UserModelRepository userModelRepository,
         DocumentRepository documentRepository,
-        AuthService authService
+        AuthService authService,
+        AbstractRequestLogsService requestLogsService
     ) {
         super(authService);
         this.userModelRepository = userModelRepository;
         this.documentRepository = documentRepository;
+        this.requestLogsService = requestLogsService;
     }
 
-    public boolean logAction(RequestStatus requestStatus) {
-        // TODO: To be implemented on sprint two
+    public boolean logAction() {
+        requestLogsService.logAction();
         return true;
     }
 
