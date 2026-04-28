@@ -35,7 +35,7 @@ public class ConcreteDocumentService extends AbstractDocumentService{
         Long studentId = isAuthorized(List.of(UserRole.STUDENT));
 
         return documentRepository
-            .findById(studentId).
+            .findAllByStudentId(studentId).
             stream()
             .map(this::mapToDocumentResponseDTO)
             .toList();
