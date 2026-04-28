@@ -38,9 +38,9 @@ public class Payment {
     private PaymentMethod paymentMethod;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "documentRequest_id", nullable = false)
+    @JoinColumn(name = "document_request_id", nullable = false)
     private DocumentRequest documentrequest;
-     
+
     @PrePersist
     void onCreate() {
         this.paidAt = LocalDateTime.now();

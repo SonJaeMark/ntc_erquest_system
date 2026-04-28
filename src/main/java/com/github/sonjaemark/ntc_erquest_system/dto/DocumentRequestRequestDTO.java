@@ -4,6 +4,9 @@ import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.Purpose;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public record DocumentRequestRequestDTO(
     @NotNull(message = "Purpose is required")
     Purpose purpose,
