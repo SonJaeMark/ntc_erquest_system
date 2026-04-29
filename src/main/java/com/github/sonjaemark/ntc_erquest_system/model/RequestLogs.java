@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -21,11 +22,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "request_logs")
 @Data
-@Table(name="request_logs_table")
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RequestLogs {
 
     @Id
@@ -43,8 +44,13 @@ public class RequestLogs {
 
     private String remarks;
 
+    @PrePersist
+    public void onCreate() {
+        this.dateAction = LocalDateTime.now();
+    }
+
     @PreUpdate
-    public void onUpdate(){
+    public void onUpdate() {
         this.dateAction = LocalDateTime.now();
     }
 }
