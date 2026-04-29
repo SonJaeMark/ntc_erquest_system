@@ -14,7 +14,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class ConcreteRequestLogsService extends AbstractRequestLogsService{
+public class ConcreteRequestLogsService extends AbstractRequestLogsService implements IRequestLogsQueryService{
 
     private final RequestLogsRepository requestLogsRepository;
 
@@ -28,6 +28,15 @@ public class ConcreteRequestLogsService extends AbstractRequestLogsService{
         isAuthorized(List.of(UserRole.REGISTRAR, UserRole.STUDENT));
         RequestLogs requestLogs = mapToRequestLogs(getRequestLogsRequestDTO());    
         return mapToRequestLogsResponseDTO(requestLogsRepository.save(requestLogs));
+    }
+
+    @Override
+    public List<RequestLogsResponseDTO> getRequestLogsByDocumentRequestId(Long id) {
+        return requestLogsRepository
+            .findAllByDocumentRequestId(id)
+            .stream()
+            .map(this::mapToRequestLogsResponseDTO)
+            .toList();
     }
 
 }
