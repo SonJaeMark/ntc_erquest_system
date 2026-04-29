@@ -7,7 +7,9 @@ public record PaymentResponseDTO(
     Boolean isPaid,
     Double amount,
     LocalDateTime paidAt,
-    Long documentRequestId
+    Long documentRequestId,
+    Boolean validated,
+    String referenceNumber
 ) {
 
 }
