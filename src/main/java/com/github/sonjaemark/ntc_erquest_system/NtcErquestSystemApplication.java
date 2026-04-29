@@ -11,6 +11,7 @@ import com.github.sonjaemark.ntc_erquest_system.dto.RegisterRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.Payment;
+import com.github.sonjaemark.ntc_erquest_system.model.RequestLogs;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.PaymentMethod;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.Purpose;
@@ -19,6 +20,7 @@ import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.PaymentRepository;
+import com.github.sonjaemark.ntc_erquest_system.repository.RequestLogsRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 
@@ -34,7 +36,8 @@ public class NtcErquestSystemApplication {
 			UserModelRepository userModelRepository,
 			DocumentRepository documentRepository,
 		    DocumentRequestRepository documentRequestRepository,
-		    PaymentRepository paymentRepository) {
+		    PaymentRepository paymentRepository,
+		    RequestLogsRepository requestLogsRepository) {
 		return args -> {
 			// Registrar 1
 			authService.register(
@@ -148,6 +151,25 @@ public class NtcErquestSystemApplication {
 					.paymentMethod(PaymentMethod.CASH)
 					.documentrequest(documentRequestRepository.findById(1L).orElseThrow())
 					.build()
+				);
+
+				requestLogsRepository.saveAll(
+    				List.of(
+						RequestLogs.builder()
+						.documentRequest(documentRequestRepository.findById(1L).orElseThrow())
+                        .requestStatus(RequestStatus.PENDING)
+                        .remarks("Document request created")
+						
+						.build(),
+						RequestLogs.builder()
+						
+						
+						.build(),
+						RequestLogs.builder()
+						
+						
+						.build()
+					)
 				);
 
 		};
