@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,4 +38,9 @@ public class UserModel {
     private UserRole role;
     
     private boolean isActive;
+
+    @PrePersist
+    void onCreate(){
+        this.isActive = true;
+    }
 }
