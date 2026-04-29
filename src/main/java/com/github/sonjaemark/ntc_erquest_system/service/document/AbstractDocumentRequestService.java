@@ -72,8 +72,6 @@ public abstract class AbstractDocumentRequestService extends AuthLevel{
         );
     }
 
-
-
     public abstract DocumentRequestResponseDTO submit();
     public abstract DocumentRequestResponseDTO process();
     public abstract DocumentRequestResponseDTO accept();
