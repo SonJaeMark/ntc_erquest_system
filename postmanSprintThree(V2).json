@@ -1,0 +1,488 @@
+{
+  "info": {
+    "name": "postmanSprintThree(V2)",
+    "description": "Postman collection for NTC Erquest System API testing with separate user flows for Student and Registrar, including access and refresh token handling.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "student_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrar_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrar_refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_refresh_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@email.com\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('Access Token:', response.accessToken);",
+                  "    console.log('Refresh Token:', response.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"your_refresh_token_here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer your_access_token_here"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"your_refresh_token_here\",\n  \"accessToken\": \"your_access_token_here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student Flow",
+      "item": [
+        {
+          "name": "Student Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('student_access_token', response.accessToken);",
+                  "    pm.collectionVariables.set('student_refresh_token', response.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Student Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document/student",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document", "student"]
+            }
+          }
+        },
+        {
+          "name": "Submit Document Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"SCHOLARSHIP\",\n  \"documentType\": \"CERTIFICATE_OF_ENROLLMENT\",\n  \"documentId\": 1,\n  \"additionalDetails\": \"For scholarship application\",\n  \"remarks\": \"Please process quickly\",\n  \"status\": \"PENDING\",\n  \"studentId\": 3,\n  \"registrarId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document-request/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Document Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/student",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "student"]
+            }
+          }
+        },
+        {
+          "name": "Make Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100.0,\n  \"paymentMethod\": \"CASH\",\n  \"documentRequestId\": 1,\n  \"referenceNumber\": \"REF123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "pending"]
+            }
+          }
+        },
+        {
+          "name": "Student Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student_refresh_token}}\",\n  \"accessToken\": \"{{student_access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrar Flow",
+      "item": [
+        {
+          "name": "Registrar Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"registrar1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('registrar_access_token', response.accessToken);",
+                  "    pm.collectionVariables.set('registrar_refresh_token', response.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Pending Document Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "pending"]
+            }
+          }
+        },
+        {
+          "name": "Process Document Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"SCHOLARSHIP\",\n  \"documentType\": \"CERTIFICATE_OF_ENROLLMENT\",\n  \"documentId\": 1,\n  \"additionalDetails\": \"For scholarship application\",\n  \"remarks\": \"Processing started\",\n  \"status\": \"PROCESSING\",\n  \"studentId\": 3,\n  \"registrarId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document-request/process",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "process"]
+            }
+          }
+        },
+        {
+          "name": "Accept Document Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"SCHOLARSHIP\",\n  \"documentType\": \"CERTIFICATE_OF_ENROLLMENT\",\n  \"documentId\": 1,\n  \"additionalDetails\": \"For scholarship application\",\n  \"remarks\": \"Accepted and ready for release\",\n  \"status\": \"READY_FOR_RELEASE\",\n  \"studentId\": 3,\n  \"registrarId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document-request/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "accept"]
+            }
+          }
+        },
+        {
+          "name": "Get Accepted Document Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/registrar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "registrar"]
+            }
+          }
+        },
+        {
+          "name": "Get Request Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/logs/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "logs", "1"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar_refresh_token}}\",\n  \"accessToken\": \"{{registrar_access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
