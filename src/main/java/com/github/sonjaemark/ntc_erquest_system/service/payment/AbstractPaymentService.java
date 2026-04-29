@@ -1,5 +1,8 @@
 package com.github.sonjaemark.ntc_erquest_system.service.payment;
 
+import java.util.List;
+
+
 import com.github.sonjaemark.ntc_erquest_system.dto.PaymentRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.PaymentResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthLevel;
@@ -19,5 +22,10 @@ public abstract class AbstractPaymentService extends AuthLevel {
     }
 
     public abstract PaymentResponseDTO pay();
+    
+    public abstract PaymentResponseDTO validatePayment(Long paymentId);
+
+    
+    public abstract List<PaymentResponseDTO> listPendingPayments();
     
 }
