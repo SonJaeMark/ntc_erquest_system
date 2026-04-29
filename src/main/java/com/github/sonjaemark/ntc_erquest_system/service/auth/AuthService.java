@@ -1,5 +1,10 @@
 package com.github.sonjaemark.ntc_erquest_system.service.auth;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +21,10 @@ import com.github.sonjaemark.ntc_erquest_system.exception.EmailAlreadyExistExcep
 import com.github.sonjaemark.ntc_erquest_system.exception.EmailNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.exception.InvalidRefreshTokenException;
 import com.github.sonjaemark.ntc_erquest_system.exception.PasswordInvalidException;
+import com.github.sonjaemark.ntc_erquest_system.exception.UnauthorizedUserException;
 import com.github.sonjaemark.ntc_erquest_system.model.RefreshToken;
 import com.github.sonjaemark.ntc_erquest_system.model.UserModel;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.RefreshTokenRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.token.RefreshTokenService;
@@ -41,6 +48,9 @@ public class AuthService {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private LoggedUser loggedUser;
 
     public AuthResponseDTO login(LoginRequestDTO request) {
 
@@ -92,6 +102,8 @@ public class AuthService {
 
         // If the email does not exist, create a new user with the provided details and save it to the database
         UserModel user = UserModel.builder()
+            .firstName(request.firstName())
+            .lastName(request.lastName())
             .email(request.email())
             .password(passwordEncoder.encode(request.password()))
             .role(request.role())
@@ -158,5 +170,14 @@ public class AuthService {
             null
         );
     }
-    
+
+    public UserModel getAuthorizedUser(List<UserRole> roles) {
+        UserModel user = loggedUser.getLoggedUser();
+
+        if (roles.contains(user.getRole())) {
+            return user;
+        }
+        
+        throw new UnauthorizedUserException("Unauthorized access: role not allowed");
+    }
 }

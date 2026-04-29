@@ -1,8 +1,13 @@
 package com.github.sonjaemark.ntc_erquest_system.model;
 
-import java.time.LocalDateTime;
+
+
+import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,21 +20,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "refresh_tokens_table")
+@Table(name = "document_request_item")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RefreshToken {
+public class DocumentRequestItem {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String token;
+    @Enumerated(EnumType.STRING)
+    private DocumentType documentType;
 
-    private LocalDateTime expiryDate;
+    private int quantity;
+    private int copies;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserModel user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_request_id", nullable = false)
+    private DocumentRequest documentRequest;
+
 }
