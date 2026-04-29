@@ -9,9 +9,16 @@ import org.springframework.context.annotation.Bean;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.RegisterRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.model.Document;
+import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
+import com.github.sonjaemark.ntc_erquest_system.model.Payment;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.DocumentType;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.PaymentMethod;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.Purpose;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
+import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestRepository;
+import com.github.sonjaemark.ntc_erquest_system.repository.PaymentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 
@@ -25,7 +32,9 @@ public class NtcErquestSystemApplication {
 	@Bean
 	public CommandLineRunner run(AuthService authService, 
 			UserModelRepository userModelRepository,
-			DocumentRepository documentRepository) {
+			DocumentRepository documentRepository,
+		    DocumentRequestRepository documentRequestRepository,
+		    PaymentRepository paymentRepository) {
 		return args -> {
 			// Registrar 1
 			authService.register(
@@ -97,6 +106,49 @@ public class NtcErquestSystemApplication {
 					}
 				});
 			}
+
+			documentRequestRepository.saveAll(List.of(
+				DocumentRequest.builder()
+					.purpose(Purpose.SCHOLARSHIP)
+					.documentType(DocumentType.CERTIFICATE_OF_ENROLLMENT)
+					.document(documentRepository.findById(1L).orElseThrow())
+					.additionalDetails("Need for personal use")
+					.remarks("Please process quickly")
+					.status(RequestStatus.PENDING)
+					.student(userModelRepository.findById(3L).orElseThrow())
+					.registrar(userModelRepository.findById(1L).orElseThrow())
+					.build(),
+				DocumentRequest.builder()
+					.purpose(Purpose.SCHOLARSHIP)
+					.documentType(DocumentType.CERTIFICATE_OF_ENROLLMENT)
+					.document(documentRepository.findById(2L).orElseThrow())
+					.additionalDetails("Required for job application")
+					.remarks("Urgent request")
+					.status(RequestStatus.PENDING)
+					.student(userModelRepository.findById(4L).orElseThrow())
+					.registrar(userModelRepository.findById(1L).orElseThrow())
+					.build(),
+				DocumentRequest.builder()
+					.purpose(Purpose.SCHOLARSHIP)
+					.documentType(DocumentType.DIPLOMA)
+					.document(documentRepository.findById(3L).orElseThrow())
+					.additionalDetails("For graduate school application")
+					.remarks("Please expedite the process")
+					.status(RequestStatus.PENDING)
+					.student(userModelRepository.findById(5L).orElseThrow())
+					.registrar(userModelRepository.findById(2L).orElseThrow())
+					.build()
+			));
+
+			
+
+				paymentRepository.save(
+					Payment.builder()
+					.amount(100.0)
+					.paymentMethod(PaymentMethod.CASH)
+					.documentrequest(documentRequestRepository.findById(1L).orElseThrow())
+					.build()
+				);
 
 		};
 	}
