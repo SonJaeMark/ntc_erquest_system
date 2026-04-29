@@ -88,10 +88,12 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
 
+        documentRequest.setStatus(RequestStatus.PROCESSING);
+
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
 
         requestLogsService.setRequestLogsRequestDTO(
-            new RequestLogsRequestDTO(savedDocumentRequest.getId(), savedDocumentRequest.getStatus(), savedDocumentRequest.getRemarks())
+            new RequestLogsRequestDTO(savedDocumentRequest.getId(), RequestStatus.PROCESSING, savedDocumentRequest.getRemarks())
         );
         
         logAction();  // logging document request status
