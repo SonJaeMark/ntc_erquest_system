@@ -32,6 +32,7 @@ public class ConcreteRequestLogsService extends AbstractRequestLogsService imple
 
     @Override
     public List<RequestLogsResponseDTO> getRequestLogsByDocumentRequestId(Long id) {
+        isAuthorized(List.of(UserRole.REGISTRAR, UserRole.STUDENT));
         return requestLogsRepository
             .findAllByDocumentRequestId(id)
             .stream()
