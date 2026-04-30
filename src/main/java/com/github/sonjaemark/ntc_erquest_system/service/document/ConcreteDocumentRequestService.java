@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundException;
+import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
@@ -39,12 +40,22 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         logAction(RequestStatus.PENDING);
 
         DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
-        System.out.println("########################## STUDENT ID"+id+" ##########################");
-        if (!documentRepository.findAllByStudentId(id).stream().anyMatch(doc -> {
-                    return doc.getDocumentType().equals(documentRequestDTO.documentType());
-                })) {
+
+        List<DocumentRequest> docRec = 
+            documentRequestRepository
+            .findByDocumentTypeAndStudentIdAndStatus(
+            documentRequestDTO.documentType(), 
+            id, 
+            RequestStatus.PENDING
+        );
+
+        if (docRec.isEmpty()) {
             throw new DocumentNotFoundException("Cannot proccess document request, document not available");
         };
+
+        if(docRec.stream().findAny().isPresent()) {
+            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, document not available");
+        }
         
 
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
