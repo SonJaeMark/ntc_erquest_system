@@ -3,12 +3,9 @@ package com.github.sonjaemark.ntc_erquest_system.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.github.sonjaemark.ntc_erquest_system.dto.RegisterRequestDTO; // Import this
 import com.github.sonjaemark.ntc_erquest_system.dto.RegisterResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.service.user.UserManagementService;
 
@@ -30,5 +27,12 @@ public class UserManagementController {
     @PostMapping("/toggle/{userId}")
     public ResponseEntity<RegisterResponseDTO> toggleActiveStatus(@PathVariable Long userId) {
         return ResponseEntity.ok(userManagementService.toggleActiveStatus(userId));
+    }
+
+    // New Register Endpoint
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponseDTO> registerUser(@RequestBody RegisterRequestDTO registerRequestDTO) {
+        userManagementService.setRegisterRequestDTO(registerRequestDTO);
+        return ResponseEntity.ok(userManagementService.registerUser());
     }
 }
