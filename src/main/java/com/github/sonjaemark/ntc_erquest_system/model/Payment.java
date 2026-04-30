@@ -33,6 +33,8 @@ public class Payment {
 
     private double amount;
     private LocalDateTime paidAt;
+    private Boolean validated;
+    private String referenceNumber;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;

@@ -64,7 +64,7 @@ public class DocumentRequestController {
     }
 
     @GetMapping("/logs/{documentRequestId}")
-    public ResponseEntity<List<RequestLogsResponseDTO>> getMethodName(@RequestParam Long documentRequestId) {
+    public ResponseEntity<List<RequestLogsResponseDTO>> getMethodName(@PathVariable Long documentRequestId) {
         return ResponseEntity.ok(requestLogsQueryService.getRequestLogsByDocumentRequestId(documentRequestId));
     }
 

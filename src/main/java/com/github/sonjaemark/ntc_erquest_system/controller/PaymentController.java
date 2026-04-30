@@ -1,6 +1,9 @@
 package com.github.sonjaemark.ntc_erquest_system.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +26,9 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseDTO> pay(@RequestBody PaymentRequestDTO paymentRequestDTO){
         paymentService.setPaymentRequestDTO(paymentRequestDTO);
         return ResponseEntity.ok(paymentService.pay());
+    }
+    @GetMapping("/pending")
+    public ResponseEntity<List<PaymentResponseDTO>> pending(){
+        return ResponseEntity.ok(paymentService.listPendingPayments());
     }
 }
