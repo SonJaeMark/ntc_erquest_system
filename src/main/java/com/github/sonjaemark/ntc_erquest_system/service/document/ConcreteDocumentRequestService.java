@@ -10,6 +10,7 @@ import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
+import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
@@ -52,12 +53,16 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             RequestStatus.PENDING
         );
 
-        if (docRec.isEmpty()) {
-            throw new DocumentNotFoundException("Cannot proccess document request, document not available");
-        };
+        List<Document> studentsAvailableDocs = documentRepository.findAllByStudentId(id);
+
+        if (studentsAvailableDocs.stream().noneMatch(
+                doc -> doc.getDocumentType().equals(documentRequestDTO.documentType())
+            )) {
+            throw new DocumentNotFoundException("Cannot process document request, document not available");
+        }
 
         if(docRec.stream().findAny().isPresent()) {
-            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, document not available");
+            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, request on this document exist and on PENDDING");
         }
         
 
