@@ -62,7 +62,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         }
 
         if(docRec.stream().findAny().isPresent()) {
-            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, document not available");
+            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, request on this document exist and on PENDDING");
         }
         
 
