@@ -1,0 +1,822 @@
+{
+  "info": {
+    "_postman_id": "ntc-erquest-system-tests",
+    "name": "NTC ERequest System - Complete API Tests",
+    "description": "Comprehensive test suite for NTC ERequest System with separate user tokens and CLI logging",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Registration & Authentication",
+      "item": [
+        {
+          "name": "Register Student User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== REGISTER STUDENT USER ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Student User ID: ' + jsonData.id);",
+                  "  console.log('Email: ' + jsonData.email);",
+                  "  console.log('First Name: ' + jsonData.firstName);",
+                  "  console.log('Last Name: ' + jsonData.lastName);",
+                  "  pm.environment.set('student_user_id', jsonData.id);",
+                  "  pm.environment.set('student_email', jsonData.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student{{$randomInt}}.test@example.com\",\n  \"password\": \"Password@123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Student\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Registrar User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== REGISTER REGISTRAR USER ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Registrar User ID: ' + jsonData.id);",
+                  "  console.log('Email: ' + jsonData.email);",
+                  "  console.log('First Name: ' + jsonData.firstName);",
+                  "  console.log('Last Name: ' + jsonData.lastName);",
+                  "  pm.environment.set('registrar_user_id', jsonData.id);",
+                  "  pm.environment.set('registrar_email', jsonData.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"registrar{{$randomInt}}.test@example.com\",\n  \"password\": \"Password@123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Registrar\",\n  \"role\": \"REGISTRAR\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login Student User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== LOGIN STUDENT USER ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('User ID: ' + jsonData.userId);",
+                  "  console.log('Role: ' + jsonData.role);",
+                  "  console.log('Access Token (first 50 chars): ' + jsonData.accessToken.substring(0, 50) + '...');",
+                  "  console.log('Refresh Token (first 50 chars): ' + jsonData.refreshToken.substring(0, 50) + '...');",
+                  "  pm.environment.set('student_access_token', jsonData.accessToken);",
+                  "  pm.environment.set('student_refresh_token', jsonData.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{student_email}}\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Registrar User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== LOGIN REGISTRAR USER ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('User ID: ' + jsonData.userId);",
+                  "  console.log('Role: ' + jsonData.role);",
+                  "  console.log('Access Token (first 50 chars): ' + jsonData.accessToken.substring(0, 50) + '...');",
+                  "  console.log('Refresh Token (first 50 chars): ' + jsonData.refreshToken.substring(0, 50) + '...');",
+                  "  pm.environment.set('registrar_access_token', jsonData.accessToken);",
+                  "  pm.environment.set('registrar_refresh_token', jsonData.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{registrar_email}}\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Student Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== REFRESH STUDENT ACCESS TOKEN ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('New Access Token (first 50 chars): ' + jsonData.accessToken.substring(0, 50) + '...');",
+                  "  console.log('New Refresh Token (first 50 chars): ' + jsonData.refreshToken.substring(0, 50) + '...');",
+                  "  pm.environment.set('student_access_token', jsonData.accessToken);",
+                  "  pm.environment.set('student_refresh_token', jsonData.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student_refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Registrar Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== REFRESH REGISTRAR ACCESS TOKEN ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('New Access Token (first 50 chars): ' + jsonData.accessToken.substring(0, 50) + '...');",
+                  "  console.log('New Refresh Token (first 50 chars): ' + jsonData.refreshToken.substring(0, 50) + '...');",
+                  "  pm.environment.set('registrar_access_token', jsonData.accessToken);",
+                  "  pm.environment.set('registrar_refresh_token', jsonData.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar_refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh-token"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Document Endpoints",
+      "item": [
+        {
+          "name": "Get Student Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== GET STUDENT DOCUMENTS ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Student Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Total Documents: ' + jsonData.length);",
+                  "  if (jsonData.length > 0) {",
+                  "    console.log('First Document: ' + JSON.stringify(jsonData[0], null, 2));",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document/student",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document", "student"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Document Request Endpoints",
+      "item": [
+        {
+          "name": "Submit Document Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== SUBMIT DOCUMENT REQUEST ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Student Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Document Request ID: ' + jsonData.id);",
+                  "  console.log('Status: ' + jsonData.status);",
+                  "  console.log('Student ID: ' + jsonData.studentId);",
+                  "  pm.environment.set('document_request_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentRequestItems\": [\n    {\n      \"documentId\": 1,\n      \"quantity\": 2,\n      \"remarks\": \"For school application\"\n    }\n  ],\n  \"purpose\": \"School Application\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document-request/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Document Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== GET STUDENT DOCUMENT REQUESTS ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Student Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Total Requests: ' + jsonData.length);",
+                  "  if (jsonData.length > 0) {",
+                  "    jsonData.forEach(function(req, index) {",
+                  "      console.log('Request ' + (index + 1) + ' ID: ' + req.id + ', Status: ' + req.status);",
+                  "    });",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/student",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "student"]
+            }
+          }
+        },
+        {
+          "name": "Process Document Request (Registrar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== PROCESS DOCUMENT REQUEST ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Registrar Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Document Request ID: ' + jsonData.id);",
+                  "  console.log('Status: ' + jsonData.status);",
+                  "  console.log('Updated At: ' + jsonData.updatedAt);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{document_request_id}},\n  \"documentRequestItems\": [],\n  \"purpose\": \"School Application\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document-request/process",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "process"]
+            }
+          }
+        },
+        {
+          "name": "Accept Document Request (Registrar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== ACCEPT DOCUMENT REQUEST ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Registrar Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Document Request ID: ' + jsonData.id);",
+                  "  console.log('Status: ' + jsonData.status);",
+                  "  console.log('Registrar ID: ' + jsonData.registrarId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{document_request_id}},\n  \"documentRequestItems\": [],\n  \"purpose\": \"School Application\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document-request/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "accept"]
+            }
+          }
+        },
+        {
+          "name": "Get Registrar Document Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== GET REGISTRAR DOCUMENT REQUESTS ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Registrar Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Total Accepted Requests: ' + jsonData.length);",
+                  "  if (jsonData.length > 0) {",
+                  "    jsonData.forEach(function(req, index) {",
+                  "      console.log('Request ' + (index + 1) + ' ID: ' + req.id + ', Registrar ID: ' + req.registrarId);",
+                  "    });",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/registrar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "registrar"]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Document Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== GET PENDING DOCUMENT REQUESTS ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Registrar Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Total Unaccepted Requests: ' + jsonData.length);",
+                  "  if (jsonData.length > 0) {",
+                  "    jsonData.forEach(function(req, index) {",
+                  "      console.log('Request ' + (index + 1) + ' ID: ' + req.id + ', Status: ' + req.status);",
+                  "    });",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "pending"]
+            }
+          }
+        },
+        {
+          "name": "Get Request Logs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== GET REQUEST LOGS ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Student Access Token');",
+                  "console.log('Document Request ID: {{document_request_id}}');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Total Logs: ' + jsonData.length);",
+                  "  if (jsonData.length > 0) {",
+                  "    jsonData.forEach(function(log, index) {",
+                  "      console.log('Log ' + (index + 1) + ': ' + log.action + ' at ' + log.timestamp);",
+                  "    });",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document-request/logs/{{document_request_id}}?documentRequestId={{document_request_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document-request", "logs", "{{document_request_id}}"],
+              "query": [
+                {
+                  "key": "documentRequestId",
+                  "value": "{{document_request_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Payment Endpoints",
+      "item": [
+        {
+          "name": "Process Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== PROCESS PAYMENT ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Student Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('Payment ID: ' + jsonData.paymentId);",
+                  "  console.log('Amount: ' + jsonData.amount);",
+                  "  console.log('Status: ' + jsonData.paymentStatus);",
+                  "  console.log('Reference Number: ' + jsonData.referenceNumber);",
+                  "  pm.environment.set('payment_id', jsonData.paymentId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentRequestId\": {{document_request_id}},\n  \"amount\": 150.00,\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"referenceNumber\": \"REF-{{$timestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Logout Endpoints",
+      "item": [
+        {
+          "name": "Logout Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== LOGOUT STUDENT USER ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Student Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  console.log('Student logged out successfully');",
+                  "  pm.environment.set('student_access_token', '');",
+                  "  pm.environment.set('student_refresh_token', '');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{student_refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Logout Registrar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('\\n=== LOGOUT REGISTRAR USER ===');",
+                  "console.log('Status Code: ' + pm.response.code);",
+                  "console.log('Response Time: ' + pm.response.responseTime + 'ms');",
+                  "console.log('User Token: Registrar Access Token');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  console.log('Registrar logged out successfully');",
+                  "  pm.environment.set('registrar_access_token', '');",
+                  "  pm.environment.set('registrar_refresh_token', '');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrar_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{registrar_refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "student_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrar_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrar_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrar_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrar_refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "document_request_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "payment_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
