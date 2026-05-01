@@ -39,19 +39,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
 
-        if(header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+        if (header == null || !header.startsWith("Bearer ")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                {
+                    "status": 401,
+                    "message": "Unauthorized user: Missing Bearer access token",
+                    "timestamp": "%s"
+                }
+                """.formatted(java.time.LocalDateTime.now()));
             return;
         }
 
         String token = header.substring(7);
 
-        if (jwtService.isTokenBlocked(token)) throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
+        if (jwtService.isTokenBlocked(token)) {
+            throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
+        }
 
         try {
             String username = jwtService.extractEmail(token);
 
-            if(username != null &&
+            if (username != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 var userDetails =
@@ -67,6 +77,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (JwtException | IllegalArgumentException ex) {
             SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                {
+                    "status": 401,
+                    "message": "Unauthorized user: Invalid or expired access token",
+                    "timestamp": "%s"
+                }
+                """.formatted(java.time.LocalDateTime.now()));
+            return;
         }
 
         filterChain.doFilter(request, response);

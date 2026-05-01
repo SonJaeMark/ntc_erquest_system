@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "https://ntc-erquest-system-omyz.onrender.com"
     },
     {
       "key": "student1_email",
