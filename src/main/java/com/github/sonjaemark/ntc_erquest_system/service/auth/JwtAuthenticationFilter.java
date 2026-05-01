@@ -6,7 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.github.sonjaemark.ntc_erquest_system.exception.AccessTokenBlockedException;
 import com.github.sonjaemark.ntc_erquest_system.service.user.CustomUserDetailsService;
 
 import io.jsonwebtoken.JwtException;
@@ -20,6 +19,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTH_PATH_PREFIX = "/auth/";
+    public static final String AUTH_ERROR_ATTR = "auth_error_message";
     @Autowired
     private JwtService jwtService;
 
@@ -40,22 +40,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("""
-                {
-                    "status": 401,
-                    "message": "Unauthorized user: Missing Bearer access token",
-                    "timestamp": "%s"
-                }
-                """.formatted(java.time.LocalDateTime.now()));
+            request.setAttribute(AUTH_ERROR_ATTR, "Unauthorized user: Missing Bearer access token");
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
             return;
         }
 
         String token = header.substring(7);
 
         if (jwtService.isTokenBlocked(token)) {
-            throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
+            request.setAttribute(AUTH_ERROR_ATTR, "Unauthorized user: Blocked access token");
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
         }
 
         try {
@@ -77,15 +74,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (JwtException | IllegalArgumentException ex) {
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("""
-                {
-                    "status": 401,
-                    "message": "Unauthorized user: Invalid or expired access token",
-                    "timestamp": "%s"
-                }
-                """.formatted(java.time.LocalDateTime.now()));
+            request.setAttribute(AUTH_ERROR_ATTR, "Unauthorized user: Invalid or expired access token");
+            filterChain.doFilter(request, response);
             return;
         }
 

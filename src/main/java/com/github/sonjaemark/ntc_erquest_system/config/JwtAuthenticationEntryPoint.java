@@ -7,6 +7,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+import com.github.sonjaemark.ntc_erquest_system.service.auth.JwtAuthenticationFilter;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -23,7 +25,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType("application/json");
         LocalDateTime timestamp = LocalDateTime.now();
 
-        String message = "Unauthorized user: " + authException.getMessage();
+        Object authError = request.getAttribute(JwtAuthenticationFilter.AUTH_ERROR_ATTR);
+        String message;
+
+        if (authError instanceof String customMessage && !customMessage.isBlank()) {
+            message = customMessage;
+        } else {
+            message = "Unauthorized user: " + authException.getMessage();
+        }
 
         String jsonResponse = String.format("""
             {
