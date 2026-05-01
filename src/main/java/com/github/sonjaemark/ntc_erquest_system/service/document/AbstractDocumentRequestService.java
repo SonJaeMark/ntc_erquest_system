@@ -2,7 +2,11 @@ package com.github.sonjaemark.ntc_erquest_system.service.document;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundException;
+import com.github.sonjaemark.ntc_erquest_system.exception.IdNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
+import com.github.sonjaemark.ntc_erquest_system.model.UserModel;
+import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthLevel;
@@ -27,20 +31,26 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
         this.requestLogsService = requestLogsService;
     }
 
-    protected boolean logAction() {
-        requestLogsService.logAction();
+    protected boolean logAction(DocumentRequest documentRequest, String remarks) {
+        requestLogsService.logAction(documentRequest, remarks);
         return true;
     }
 
     protected DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO documentRequestDTO) {
+        UserModel student = userModelRepository.findById(documentRequestDTO.studentId())
+                .orElseThrow(() -> new IdNotFoundException("Student not found with ID: " + documentRequestDTO.studentId()));
+
+        Document document = documentRepository.findById(documentRequestDTO.documentId())
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found with ID: " + documentRequestDTO.documentId()));
+
         return DocumentRequest.builder()
                 .purpose(documentRequestDTO.purpose())
                 .documentType(documentRequestDTO.documentType())
                 .additionalDetails(documentRequestDTO.additionalDetails())
                 .remarks(documentRequestDTO.remarks())
                 .status(documentRequestDTO.status())
-                .student(userModelRepository.findById(documentRequestDTO.studentId()).orElse(null))
-                .document(documentRepository.findById(documentRequestDTO.documentId()).orElse(null))
+                .student(student)
+                .document(document)
                 .build();
     }
 

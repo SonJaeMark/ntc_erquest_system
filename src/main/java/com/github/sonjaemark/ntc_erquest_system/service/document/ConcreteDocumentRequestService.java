@@ -36,6 +36,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
     @Override
     public DocumentRequestResponseDTO submit(DocumentRequestRequestDTO documentRequestDTO) {
+        System.out.println("DEBUG: Submit request received: " + documentRequestDTO);
         isAuthorized(List.of(UserRole.STUDENT));
 
         boolean hasActiveRequest = documentRequestRepository.existsByStudentIdAndStatusIn(
@@ -56,7 +57,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction();
+        logAction(savedDocumentRequest, "Student submitted a document request for " + savedDocumentRequest.getDocumentType());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
@@ -69,7 +70,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction();
+        logAction(savedDocumentRequest, "Registrar updated the request status to " + savedDocumentRequest.getStatus());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
@@ -83,7 +84,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction();
+        logAction(savedDocumentRequest, "Registrar accepted the request");
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
@@ -117,8 +118,8 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
     @Override
     public List<DocumentRequestResponseDTO> getAllDocumentRequestByStudentId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllDocumentRequestByStudentId'");
+        Long id = isAuthorized(List.of(UserRole.STUDENT));
+        return getAllByStudentId(id);
     }
 
     @Override

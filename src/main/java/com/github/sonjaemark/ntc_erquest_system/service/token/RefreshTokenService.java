@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.sonjaemark.ntc_erquest_system.exception.IdNotFoundException;
-import com.github.sonjaemark.ntc_erquest_system.exception.InvalidRefreshTokenException;
 import com.github.sonjaemark.ntc_erquest_system.exception.RefreshTokenExpiredException;
 import com.github.sonjaemark.ntc_erquest_system.model.RefreshToken;
 import com.github.sonjaemark.ntc_erquest_system.model.UserModel;

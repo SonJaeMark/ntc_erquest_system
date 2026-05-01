@@ -19,6 +19,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException)
             throws IOException {
 
+        System.out.println("DEBUG: 401 Unauthorized at " + request.getMethod() + " " + request.getServletPath() + " - " + authException.getMessage());
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         LocalDateTime timestamp = LocalDateTime.now();

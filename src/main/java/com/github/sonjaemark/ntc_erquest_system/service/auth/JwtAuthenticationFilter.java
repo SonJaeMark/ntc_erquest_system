@@ -29,8 +29,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+        String path = request.getServletPath();
+        String method = request.getMethod();
 
         if(header == null || !header.startsWith("Bearer ")) {
+            if (!path.startsWith("/auth/")) {
+                System.out.println("DEBUG: Missing or invalid Authorization header for " + method + " " + path);
+            }
             filterChain.doFilter(request, response);
             return;
         }
@@ -38,10 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = header.substring(7);
         // Handle potential double "Bearer " prefix if it was mistakenly sent by frontend
         if (token.startsWith("Bearer ")) {
+            System.out.println("DEBUG: Double Bearer prefix detected for " + path);
             token = token.substring(7);
         }
 
         if (jwtService.isTokenBlocked(token)) {
+             System.out.println("DEBUG: Token is blocked for " + path);
              throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
         }
 
@@ -61,8 +68,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                System.out.println("DEBUG: Authenticated user " + username + " for " + method + " " + path);
             }
         } catch (JwtException | IllegalArgumentException ex) {
+            System.out.println("DEBUG: JWT validation failed for " + path + ": " + ex.getMessage());
             SecurityContextHolder.clearContext();
         }
 
