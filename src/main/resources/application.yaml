@@ -25,3 +25,7 @@ spring:
 server:
   port: ${PORT:8080}
         
+openrouter:
+  api:
+    key: ${OPENROUTER_API_KEY}
+    url: ${OPENROUTER_API_URL}

@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "openrouter.api.url",
+      "type": "java.lang.String",
+      "description": "OpenRouter API URL"
+    },
+    {
+      "name": "openrouter.api.key",
+      "type": "java.lang.String",
+      "description": "OpenRouter API Key"
+    }
+  ]
+}

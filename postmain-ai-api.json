@@ -1,0 +1,123 @@
+{
+  "info": {
+    "name": "NTC eRequest API",
+    "_postman_id": "ntc-erequest-collection",
+    "description": "Auth + AI with auto token saving",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json();",
+                  "",
+                  "// Save tokens",
+                  "pm.environment.set(\"accessToken\", jsonData.accessToken);",
+                  "pm.environment.set(\"refreshToken\", jsonData.refreshToken);",
+                  "",
+                  "// Save user info",
+                  "pm.environment.set(\"userId\", jsonData.userId);",
+                  "pm.environment.set(\"email\", jsonData.email);",
+                  "pm.environment.set(\"role\", jsonData.role);",
+                  "",
+                  "console.log(\"Access Token saved:\", jsonData.accessToken);",
+                  "",
+                  "pm.test(\"Login successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Ask AI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"How do I request TOR?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/ask",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "ask"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response exists\", function () {",
+                  "    pm.expect(pm.response.text()).to.not.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    }
+  ]
+}
