@@ -7,14 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
-
-
 
 @Service
 @Transactional
@@ -32,16 +31,33 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
     @Override
     public DocumentResponseDTO submit() {
-        isAuthorized(List.of(UserRole.STUDENT));
-        logAction(RequestStatus.PENDING);
+    isAuthorized(List.of(UserRole.STUDENT));
 
-        // Validation of request
+    DocumentRequestDTO documentRequestDTO = getDocumentRequestDTO();
 
-        DocumentRequestDTO documentRequestDTO = getDocumentRequestDTO();
-        DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
+    Long studentId = documentRequestDTO.studentId();
 
-        return mapToDocumentResponseDTO(documentRequestRepository.save(documentRequest));
+    boolean hasActiveRequest = documentRequestRepository.existsByStudentIdAndStatusIn(
+        studentId,
+        List.of(
+            RequestStatus.PENDING,
+            RequestStatus.PROCESSING,
+            RequestStatus.READY_FOR_RELEASE
+        )
+    );
+
+    if (hasActiveRequest) {
+        throw new DocumentRequestAlreadyExistException(
+            "You already have an active request. Please wait until your current document is claimed or released before submitting another request."
+        );
     }
+
+    logAction(RequestStatus.PENDING);
+
+    DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
+
+    return mapToDocumentResponseDTO(documentRequestRepository.save(documentRequest));
+}
 
     @Override
     public DocumentResponseDTO process() {

@@ -116,4 +116,18 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(errors);
     }
+    @ExceptionHandler(DocumentRequestAlreadyExistException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleDocumentRequestAlreadyExist(
+        DocumentRequestAlreadyExistException ex
+    ) {
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                    new ExceptionResponseDTO(
+                            HttpStatus.BAD_REQUEST,
+                            ex.getMessage(),
+                            LocalDateTime.now()
+                    )
+            );
+    }
 }
