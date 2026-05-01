@@ -42,33 +42,33 @@ public abstract class AbstractDocumentRequestService extends AuthLevel{
     }
 
     // Inside AbstractDocumentRequestService
-    public DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO dto) {
+    public DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO documentRequestDTO2) {
         return DocumentRequest.builder()
-            .purpose(dto.purpose())
-            .documentType(dto.documentType())
-            .additionalDetails(dto.additionalDetails())
-            .remarks(dto.remarks())
-            .status(dto.status())
-            .student(userModelRepository.findById(dto.studentId()).orElse(null))
-            .document(documentRepository.findById(dto.documentId()).orElse(null)) 
+            .purpose(documentRequestDTO2.purpose())
+            .documentType(documentRequestDTO2.documentType())
+            .additionalDetails(documentRequestDTO2.additionalDetails())
+            .remarks(documentRequestDTO2.remarks())
+            .status(documentRequestDTO2.status())
+            .student(userModelRepository.findById(documentRequestDTO2.studentId()).orElse(null))
+            .document(documentRepository.findById(documentRequestDTO2.documentId()).orElse(null)) 
             .build();
     }
 
-    public DocumentRequestResponseDTO mapToDocumentResponseDTO(DocumentRequest entity) {
+    public DocumentRequestResponseDTO mapToDocumentResponseDTO(DocumentRequest savedDocumentRequest) {
         return new DocumentRequestResponseDTO(
-            entity.getId(),
-            entity.getPurpose(),
-            entity.getDocumentType(),
-            entity.getDocument() != null ? entity.getDocument().getId() : null,
-            entity.getAdditionalDetails(),
-            entity.getRemarks(),
-            entity.getStatus(),
-            entity.getRequestedAt(),
-            entity.getUpdatedAt(),
-            entity.getStudent() != null ? entity.getStudent().getId() : null,
-            entity.getStudent() != null ? 
-                entity.getStudent().getFirstName() + " " + entity.getStudent().getLastName() : "Unknown",
-            entity.getRegistrar() != null ? entity.getRegistrar().getId() : null
+            savedDocumentRequest.getId(),
+            savedDocumentRequest.getPurpose(),
+            savedDocumentRequest.getDocumentType(),
+            savedDocumentRequest.getDocument() != null ? savedDocumentRequest.getDocument().getId() : null,
+            savedDocumentRequest.getAdditionalDetails(),
+            savedDocumentRequest.getRemarks(),
+            savedDocumentRequest.getStatus(),
+            savedDocumentRequest.getRequestedAt(),
+            savedDocumentRequest.getUpdatedAt(),
+            savedDocumentRequest.getStudent() != null ? savedDocumentRequest.getStudent().getId() : null,
+            savedDocumentRequest.getStudent() != null ? 
+                savedDocumentRequest.getStudent().getFirstName() + " " + savedDocumentRequest.getStudent().getLastName() : "Unknown",
+            savedDocumentRequest.getRegistrar() != null ? savedDocumentRequest.getRegistrar().getId() : null
         );
     }
 

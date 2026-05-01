@@ -5,9 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestDTO;
-import com.github.sonjaemark.ntc_erquest_system.dto.DocumentResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsRequestDTO;
+import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
+import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
@@ -16,6 +19,8 @@ import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestReposi
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequestLogsService;
+
+
 
 @Service
 @Transactional
@@ -35,34 +40,45 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     }
 
     @Override
-    public DocumentResponseDTO submit() {
-    isAuthorized(List.of(UserRole.STUDENT));
+    public DocumentRequestResponseDTO submit() {
+        Long id = isAuthorized(List.of(UserRole.STUDENT));
+    
+        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
 
-    DocumentRequestDTO documentRequestDTO = getDocumentRequestDTO();
-
-    Long studentId = documentRequestDTO.studentId();
-
-    boolean hasActiveRequest = documentRequestRepository.existsByStudentIdAndStatusIn(
-        studentId,
-        List.of(
-            RequestStatus.PENDING,
-            RequestStatus.PROCESSING,
-            RequestStatus.READY_FOR_RELEASE
-        )
-    );
-
-    if (hasActiveRequest) {
-        throw new DocumentRequestAlreadyExistException(
-            "You already have an active request. Please wait until your current document is claimed or released before submitting another request."
+        List<DocumentRequest> docRec = 
+            documentRequestRepository
+            .findByDocumentTypeAndStudentIdAndStatus(
+            documentRequestDTO.documentType(), 
+            id, 
+            RequestStatus.PENDING
         );
+
+        List<Document> studentsAvailableDocs = documentRepository.findAllByStudentId(id);
+
+        if (studentsAvailableDocs.stream().noneMatch(
+                doc -> doc.getDocumentType().equals(documentRequestDTO.documentType())
+            )) {
+            throw new DocumentNotFoundException("Cannot process document request, document not available");
+        }
+
+        if(docRec.stream().findAny().isPresent()) {
+            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, request on this document exist and on PENDDING");
+        }
+        
+
+        DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
+        documentRequest.setStudent(userModelRepository.findById(id).orElseThrow());
+
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
+
+        requestLogsService.setRequestLogsRequestDTO(
+            new RequestLogsRequestDTO(savedDocumentRequest.getId(), savedDocumentRequest.getStatus(), savedDocumentRequest.getRemarks())
+        );
+        
+        logAction();  // logging document request status
+
+        return mapToDocumentResponseDTO(savedDocumentRequest);
     }
-
-    logAction(RequestStatus.PENDING);
-
-    DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
-
-    return mapToDocumentResponseDTO(documentRequestRepository.save(documentRequest));
-}
 
     @Override
     public DocumentRequestResponseDTO process() {
