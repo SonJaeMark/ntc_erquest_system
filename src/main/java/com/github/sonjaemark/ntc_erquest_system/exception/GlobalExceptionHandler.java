@@ -96,11 +96,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ResponseEntity<ExceptionResponseDTO> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
+            .status(HttpStatus.UNAUTHORIZED)
             .body(
                 new ExceptionResponseDTO(
-                    HttpStatus.BAD_REQUEST, 
+                    HttpStatus.UNAUTHORIZED, 
                     ex.getMessage(), 
+                    LocalDateTime.now()
+                )
+            );
+    }
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleRefreshTokenExpired(RefreshTokenExpiredException ex) {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                new ExceptionResponseDTO(
+                    HttpStatus.UNAUTHORIZED,
+                    ex.getMessage(),
                     LocalDateTime.now()
                 )
             );
