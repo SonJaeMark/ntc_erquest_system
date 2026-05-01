@@ -14,19 +14,24 @@ import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
+import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
+import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequestLogsService;
 
 @Service
 @Transactional
-public class ConcreteDocumentRequestService extends AbstractDocumentRequestService {
+public class ConcreteDocumentRequestService extends AbstractDocumentRequestService implements IDocumentRequestQueryService{
 
     private final DocumentRequestRepository documentRequestRepository;
 
     public ConcreteDocumentRequestService(
             DocumentRequestRepository documentRequestRepository, 
             UserModelRepository userModelRepository,
-            DocumentRepository documentRepository) {
-        super(userModelRepository, documentRepository); // Pass to Abstract class
+            DocumentRepository documentRepository,
+            AuthService authService,
+            AbstractRequestLogsService requestLogsService) {
+        super(userModelRepository, documentRepository, authService, requestLogsService); // Pass to Abstract class
         this.documentRequestRepository = documentRequestRepository;
+        
     }
 
     @Override
@@ -60,31 +65,46 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 }
 
     @Override
-    public DocumentResponseDTO process() {
+    public DocumentRequestResponseDTO process() {
         isAuthorized(List.of(UserRole.REGISTRAR));
         
 
-        DocumentRequestDTO documentRequestDTO = getDocumentRequestDTO();
+        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
 
-        logAction(documentRequest.getStatus());
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
 
-        return mapToDocumentResponseDTO(documentRequestRepository.save(documentRequest));
+        requestLogsService.setRequestLogsRequestDTO(
+            new RequestLogsRequestDTO(savedDocumentRequest.getId(), savedDocumentRequest.getStatus(), savedDocumentRequest.getRemarks())
+        );
+        
+        logAction();  // logging document request status
+
+        return mapToDocumentResponseDTO(savedDocumentRequest);
     }
 
     @Override
-    public DocumentResponseDTO accept() {
+    public DocumentRequestResponseDTO accept() {
         isAuthorized(List.of(UserRole.REGISTRAR));
-        logAction(RequestStatus.PROCESSING);
 
-        DocumentRequestDTO documentRequestDTO = getDocumentRequestDTO();
+        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
 
-        return mapToDocumentResponseDTO(documentRequestRepository.save(documentRequest));
+        documentRequest.setStatus(RequestStatus.PROCESSING);
+
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
+
+        requestLogsService.setRequestLogsRequestDTO(
+            new RequestLogsRequestDTO(savedDocumentRequest.getId(), RequestStatus.PROCESSING, savedDocumentRequest.getRemarks())
+        );
+        
+        logAction();  // logging document request status
+
+        return mapToDocumentResponseDTO(savedDocumentRequest);
     }
 
-    public List<DocumentResponseDTO> getAllByStudentId(Long studentId) {
-        isAuthorized(List.of(UserRole.STUDENT));
+    public List<DocumentRequestResponseDTO> getAllDocumentRequestByStudentId() {
+        Long studentId = isAuthorized(List.of(UserRole.STUDENT));
 
         return documentRequestRepository.findByStudentId(studentId) // Get the list of entities
             .stream()                                               // Open a stream
@@ -92,7 +112,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             .toList();                                              // Collect back into a List
     }
 
-    public List<DocumentResponseDTO> getAllUnacceptedRequest() {
+    public List<DocumentRequestResponseDTO> getAllUnacceptedRequest() {
         isAuthorized(List.of(UserRole.REGISTRAR)); 
 
         return documentRequestRepository.findByStatus(RequestStatus.PENDING)    // Get all Request with PENDING status
@@ -101,14 +121,13 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             .toList();                                                          // Collect back into a List
     }
 
-    public List<DocumentResponseDTO> getAllByRegistrarId(Long registrarId) {
-        isAuthorized(List.of(UserRole.REGISTRAR)); 
+    public List<DocumentRequestResponseDTO> getAllAceptedRequestByRegistrarId() {
+        Long registrarId = isAuthorized(List.of(UserRole.REGISTRAR)); 
 
         return documentRequestRepository.findByRegistrarId(registrarId)
             .stream()
             .map(this::mapToDocumentResponseDTO)
             .toList();
     }
-
 
 }
