@@ -52,7 +52,14 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080", "https://annedula.github.io", "https://sonjaemark.github.io"));
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:5500", 
+            "http://127.0.0.1:5500", 
+            "http://localhost:8080", 
+            "https://annedula.github.io", 
+            "https://sonjaemark.github.io",
+            "https://ntc-erquest-system-1.onrender.com"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

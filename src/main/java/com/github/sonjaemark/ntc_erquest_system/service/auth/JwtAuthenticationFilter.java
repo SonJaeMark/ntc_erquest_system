@@ -38,18 +38,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+        String path = request.getServletPath();
 
         if(header == null || !header.startsWith("Bearer ")) {
+            System.out.println("DEBUG: Missing or invalid Authorization header for path: " + path);
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = header.substring(7);
+        // Handle potential double "Bearer " prefix
+        if (token.startsWith("Bearer ")) {
+            System.out.println("DEBUG: Double Bearer prefix detected, stripping it.");
+            token = token.substring(7);
+        }
+        System.out.println("DEBUG: Token received for path: " + path);
 
-        if (jwtService.isTokenBlocked(token)) throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
+        if (jwtService.isTokenBlocked(token)) {
+            System.out.println("DEBUG: Token is blocked");
+            throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
+        }
 
         try {
             String username = jwtService.extractEmail(token);
+            System.out.println("DEBUG: Extracted username: " + username);
 
             if(username != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -64,8 +76,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                System.out.println("DEBUG: Authentication set in SecurityContext for user: " + username);
             }
         } catch (JwtException | IllegalArgumentException ex) {
+            System.out.println("DEBUG: JWT extraction failed: " + ex.getMessage());
             SecurityContextHolder.clearContext();
         }
 

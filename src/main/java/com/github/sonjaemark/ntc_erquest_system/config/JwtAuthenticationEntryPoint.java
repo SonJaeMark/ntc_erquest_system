@@ -19,6 +19,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException)
             throws IOException {
 
+        System.out.println("DEBUG: Authentication failure for path: " + request.getServletPath());
+        System.out.println("DEBUG: Authentication error message: " + authException.getMessage());
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         LocalDateTime timestamp = LocalDateTime.now();
