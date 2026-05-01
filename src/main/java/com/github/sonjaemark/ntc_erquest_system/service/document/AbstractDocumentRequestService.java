@@ -9,14 +9,7 @@ import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthLevel;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequestLogsService;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
 public abstract class AbstractDocumentRequestService extends AuthLevel {
-
-    private DocumentRequestRequestDTO documentRequestDTO;
 
     protected final UserModelRepository userModelRepository;
     protected final DocumentRepository documentRepository;
@@ -70,9 +63,9 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
         );
     }
 
-    public abstract DocumentRequestResponseDTO submit();
+    public abstract DocumentRequestResponseDTO submit(DocumentRequestRequestDTO dto);
 
-    public abstract DocumentRequestResponseDTO process();
+    public abstract DocumentRequestResponseDTO process(DocumentRequestRequestDTO dto);
 
-    public abstract DocumentRequestResponseDTO accept();
+    public abstract DocumentRequestResponseDTO accept(DocumentRequestRequestDTO dto);
 }

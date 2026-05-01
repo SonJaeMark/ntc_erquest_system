@@ -35,10 +35,8 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     }
 
     @Override
-    public DocumentRequestResponseDTO submit() {
+    public DocumentRequestResponseDTO submit(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.STUDENT));
-
-        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
 
         boolean hasActiveRequest = documentRequestRepository.existsByStudentIdAndStatusIn(
             documentRequestDTO.studentId(),
@@ -64,10 +62,9 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     }
 
     @Override
-    public DocumentRequestResponseDTO process() {
+    public DocumentRequestResponseDTO process(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
 
-        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
 
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
@@ -78,10 +75,9 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     }
 
     @Override
-    public DocumentRequestResponseDTO accept() {
+    public DocumentRequestResponseDTO accept(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
 
-        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
         documentRequest.setStatus(RequestStatus.PROCESSING);
 
