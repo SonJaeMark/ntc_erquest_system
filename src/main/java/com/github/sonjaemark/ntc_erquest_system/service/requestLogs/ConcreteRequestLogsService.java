@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.model.RequestLogs;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
@@ -24,9 +25,9 @@ public class ConcreteRequestLogsService extends AbstractRequestLogsService imple
     }
 
     @Override
-    public RequestLogsResponseDTO logAction() {
+    public RequestLogsResponseDTO logAction(DocumentRequest documentRequest, String remarks) {
         isAuthorized(List.of(UserRole.REGISTRAR, UserRole.STUDENT));
-        RequestLogs requestLogs = mapToRequestLogs(getRequestLogsRequestDTO());    
+        RequestLogs requestLogs = mapToRequestLogs(documentRequest, remarks);    
         return mapToRequestLogsResponseDTO(requestLogsRepository.save(requestLogs));
     }
 

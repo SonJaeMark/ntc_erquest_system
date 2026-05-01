@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +15,19 @@ import com.github.sonjaemark.ntc_erquest_system.dto.ExceptionResponseDTO;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleInvalidDataAccessApiUsage(InvalidDataAccessApiUsageException ex) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                new ExceptionResponseDTO(
+                    HttpStatus.BAD_REQUEST,
+                    "Data access error: " + ex.getMessage(),
+                    LocalDateTime.now()
+                )
+            );
+    }
     
     @ExceptionHandler(EmailNotFoundException.class)
     public ResponseEntity<ExceptionResponseDTO> handleNotFound(EmailNotFoundException ex) {
@@ -96,11 +110,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ResponseEntity<ExceptionResponseDTO> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
+            .status(HttpStatus.UNAUTHORIZED)
             .body(
                 new ExceptionResponseDTO(
-                    HttpStatus.BAD_REQUEST, 
+                    HttpStatus.UNAUTHORIZED, 
                     ex.getMessage(), 
+                    LocalDateTime.now()
+                )
+            );
+    }
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleRefreshTokenExpired(RefreshTokenExpiredException ex) {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                new ExceptionResponseDTO(
+                    HttpStatus.UNAUTHORIZED,
+                    ex.getMessage(),
                     LocalDateTime.now()
                 )
             );
@@ -134,14 +161,45 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseDTO> handleDocumentRequestAlreadyExist(
         DocumentRequestAlreadyExistException ex
     ) {
-    return ResponseEntity
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ExceptionResponseDTO(
+                                HttpStatus.BAD_REQUEST,
+                                ex.getMessage(),
+                                LocalDateTime.now()
+                        )
+                );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponseDTO> handleAllUncaughtException(Exception ex) {
+        System.err.println("CRITICAL: Unhandled exception occurred: " + ex.getClass().getName() + " - " + ex.getMessage());
+        ex.printStackTrace();
+        
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(
+                new ExceptionResponseDTO(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "An internal server error occurred: " + ex.getMessage(),
+                    LocalDateTime.now()
+                )
+            );
+    }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        System.err.println("DEBUG: JSON Parsing error: " + ex.getMessage());
+        
+        return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                    new ExceptionResponseDTO(
-                            HttpStatus.BAD_REQUEST,
-                            ex.getMessage(),
-                            LocalDateTime.now()
-                    )
+                new ExceptionResponseDTO(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid request body or enum value: " + ex.getMostSpecificCause().getMessage(),
+                    LocalDateTime.now()
+                )
             );
     }
 }

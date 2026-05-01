@@ -19,7 +19,6 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTH_PATH_PREFIX = "/auth/";
     @Autowired
     private JwtService jwtService;
 
@@ -27,41 +26,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private CustomUserDetailsService userDetailsService;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return  (path.startsWith(AUTH_PATH_PREFIX) && path.contains("login")) ||
-                (path.startsWith(AUTH_PATH_PREFIX) && path.contains("refresh-token")) ||  
-                (path.startsWith(AUTH_PATH_PREFIX) && path.contains("logout"));
-    }
-
-    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         String path = request.getServletPath();
+        String method = request.getMethod();
 
         if(header == null || !header.startsWith("Bearer ")) {
-            System.out.println("DEBUG: Missing or invalid Authorization header for path: " + path);
+            if (!path.startsWith("/auth/")) {
+                System.out.println("DEBUG: Missing or invalid Authorization header for " + method + " " + path);
+            }
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = header.substring(7);
-        // Handle potential double "Bearer " prefix
+        // Handle potential double "Bearer " prefix if it was mistakenly sent by frontend
         if (token.startsWith("Bearer ")) {
-            System.out.println("DEBUG: Double Bearer prefix detected, stripping it.");
+            System.out.println("DEBUG: Double Bearer prefix detected for " + path);
             token = token.substring(7);
         }
-        System.out.println("DEBUG: Token received for path: " + path);
 
         if (jwtService.isTokenBlocked(token)) {
-            System.out.println("DEBUG: Token is blocked");
-            throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
+             System.out.println("DEBUG: Token is blocked for " + path);
+             throw new AccessTokenBlockedException("Invalid Access Token, token are already blocked");
         }
 
         try {
             String username = jwtService.extractEmail(token);
-            System.out.println("DEBUG: Extracted username: " + username);
 
             if(username != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -76,10 +68,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                System.out.println("DEBUG: Authentication set in SecurityContext for user: " + username);
+                System.out.println("DEBUG: Authenticated user " + username + " for " + method + " " + path);
             }
         } catch (JwtException | IllegalArgumentException ex) {
-            System.out.println("DEBUG: JWT extraction failed: " + ex.getMessage());
+            System.out.println("DEBUG: JWT validation failed for " + path + ": " + ex.getMessage());
             SecurityContextHolder.clearContext();
         }
 
