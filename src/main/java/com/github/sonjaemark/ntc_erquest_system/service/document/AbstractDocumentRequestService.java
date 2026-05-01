@@ -1,7 +1,5 @@
 package com.github.sonjaemark.ntc_erquest_system.service.document;
 
-
-
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
@@ -15,20 +13,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
-public abstract class AbstractDocumentRequestService extends AuthLevel{
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractDocumentRequestService extends AuthLevel {
 
     private DocumentRequestRequestDTO documentRequestDTO;
+
     protected final UserModelRepository userModelRepository;
     protected final DocumentRepository documentRepository;
     protected final AbstractRequestLogsService requestLogsService;
 
-    // Constructor for sub-classes to pass the repository up
     protected AbstractDocumentRequestService(
-        UserModelRepository userModelRepository,
-        DocumentRepository documentRepository,
-        AuthService authService,
-        AbstractRequestLogsService requestLogsService
+            UserModelRepository userModelRepository,
+            DocumentRepository documentRepository,
+            AuthService authService,
+            AbstractRequestLogsService requestLogsService
     ) {
         super(authService);
         this.userModelRepository = userModelRepository;
@@ -36,45 +34,45 @@ public abstract class AbstractDocumentRequestService extends AuthLevel{
         this.requestLogsService = requestLogsService;
     }
 
-    public boolean logAction() {
+    protected boolean logAction() {
         requestLogsService.logAction();
         return true;
     }
 
-    // Inside AbstractDocumentRequestService
-    public DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO documentRequestDTO2) {
+    protected DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO documentRequestDTO) {
         return DocumentRequest.builder()
-            .purpose(documentRequestDTO2.purpose())
-            .documentType(documentRequestDTO2.documentType())
-            .additionalDetails(documentRequestDTO2.additionalDetails())
-            .remarks(documentRequestDTO2.remarks())
-            .status(documentRequestDTO2.status())
-            .student(userModelRepository.findById(documentRequestDTO2.studentId()).orElse(null))
-            .document(documentRepository.findById(documentRequestDTO2.documentId()).orElse(null)) 
-            .build();
+                .purpose(documentRequestDTO.purpose())
+                .documentType(documentRequestDTO.documentType())
+                .additionalDetails(documentRequestDTO.additionalDetails())
+                .remarks(documentRequestDTO.remarks())
+                .status(documentRequestDTO.status())
+                .student(userModelRepository.findById(documentRequestDTO.studentId()).orElse(null))
+                .document(documentRepository.findById(documentRequestDTO.documentId()).orElse(null))
+                .build();
     }
 
-    public DocumentRequestResponseDTO mapToDocumentResponseDTO(DocumentRequest savedDocumentRequest) {
+    protected DocumentRequestResponseDTO mapToDocumentResponseDTO(DocumentRequest documentRequest) {
         return new DocumentRequestResponseDTO(
-            savedDocumentRequest.getId(),
-            savedDocumentRequest.getPurpose(),
-            savedDocumentRequest.getDocumentType(),
-            savedDocumentRequest.getDocument() != null ? savedDocumentRequest.getDocument().getId() : null,
-            savedDocumentRequest.getAdditionalDetails(),
-            savedDocumentRequest.getRemarks(),
-            savedDocumentRequest.getStatus(),
-            savedDocumentRequest.getRequestedAt(),
-            savedDocumentRequest.getUpdatedAt(),
-            savedDocumentRequest.getStudent() != null ? savedDocumentRequest.getStudent().getId() : null,
-            savedDocumentRequest.getStudent() != null ? 
-                savedDocumentRequest.getStudent().getFirstName() + " " + savedDocumentRequest.getStudent().getLastName() : "Unknown",
-            savedDocumentRequest.getRegistrar() != null ? savedDocumentRequest.getRegistrar().getId() : null
+                documentRequest.getId(),
+                documentRequest.getPurpose(),
+                documentRequest.getDocumentType(),
+                documentRequest.getDocument() != null ? documentRequest.getDocument().getId() : null,
+                documentRequest.getAdditionalDetails(),
+                documentRequest.getRemarks(),
+                documentRequest.getStatus(),
+                documentRequest.getRequestedAt(),
+                documentRequest.getUpdatedAt(),
+                documentRequest.getStudent() != null ? documentRequest.getStudent().getId() : null,
+                documentRequest.getStudent() != null
+                        ? documentRequest.getStudent().getFirstName() + " " + documentRequest.getStudent().getLastName()
+                        : "Unknown",
+                documentRequest.getRegistrar() != null ? documentRequest.getRegistrar().getId() : null
         );
     }
 
-
-
     public abstract DocumentRequestResponseDTO submit();
+
     public abstract DocumentRequestResponseDTO process();
+
     public abstract DocumentRequestResponseDTO accept();
 }
