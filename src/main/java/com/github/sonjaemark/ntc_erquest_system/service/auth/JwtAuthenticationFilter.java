@@ -2,6 +2,7 @@ package com.github.sonjaemark.ntc_erquest_system.service.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -75,6 +76,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException | IllegalArgumentException ex) {
             SecurityContextHolder.clearContext();
             request.setAttribute(AUTH_ERROR_ATTR, "Unauthorized user: Invalid or expired access token");
+            filterChain.doFilter(request, response);
+            return;
+        } catch (AuthenticationException ex) {
+            SecurityContextHolder.clearContext();
+            request.setAttribute(AUTH_ERROR_ATTR, "Unauthorized user: Token subject is not a valid user");
+            filterChain.doFilter(request, response);
+            return;
+        } catch (Exception ex) {
+            SecurityContextHolder.clearContext();
+            request.setAttribute(AUTH_ERROR_ATTR, "Unauthorized user: Failed to authenticate token");
             filterChain.doFilter(request, response);
             return;
         }
