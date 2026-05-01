@@ -19,7 +19,7 @@ import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequ
 
 @Service
 @Transactional
-public class ConcreteDocumentRequestService extends AbstractDocumentRequestService {
+public class ConcreteDocumentRequestService extends AbstractDocumentRequestService implements IDocumentRequestQueryService{
 
     private final DocumentRequestRepository documentRequestRepository;
 
@@ -117,5 +117,17 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             .stream()
             .map(this::mapToDocumentResponseDTO)
             .toList();
+    }
+
+    @Override
+    public List<DocumentRequestResponseDTO> getAllDocumentRequestByStudentId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllDocumentRequestByStudentId'");
+    }
+
+    @Override
+    public List<DocumentRequestResponseDTO> getAllAceptedRequestByRegistrarId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllAceptedRequestByRegistrarId'");
     }
 }
