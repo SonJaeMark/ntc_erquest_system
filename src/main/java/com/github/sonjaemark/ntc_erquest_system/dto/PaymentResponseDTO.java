@@ -10,6 +10,4 @@ public record PaymentResponseDTO(
     Long documentRequestId,
     Boolean validated,
     String referenceNumber
-) {
-
-}
+) {}

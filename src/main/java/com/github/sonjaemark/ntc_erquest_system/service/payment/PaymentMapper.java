@@ -13,15 +13,15 @@ import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestReposi
 
 @Component
 public class PaymentMapper {
-    
+
     private final DocumentRequestRepository documentRequestRepository;
 
-    public PaymentMapper(DocumentRequestRepository documentRequestRepository){
+    public PaymentMapper(DocumentRequestRepository documentRequestRepository) {
         this.documentRequestRepository = documentRequestRepository;
     }
 
-    public Payment mapToPayment(PaymentRequestDTO dto){
-        String ref = dto.paymentMethod() == PaymentMethod.CASH 
+    public Payment mapToPayment(PaymentRequestDTO dto) {
+        String ref = dto.paymentMethod() == PaymentMethod.CASH
             ? UUID.randomUUID().toString()
             : validateReference(dto.referenceNumber(), dto.paymentMethod());
 
@@ -35,13 +35,25 @@ public class PaymentMapper {
     }
 
     private String validateReference(String ref, PaymentMethod method) {
-        if (ref == null || ref.isBlank() || !ref.matches("^[a-zA-Z0-9\\-]+$")) {
-            throw new InvalidPaymentException(method + " payment requires a valid reference number");
-        }
+        if (ref == null || ref.isBlank())
+            throw new InvalidPaymentException(method + " payment requires a reference number");
+
+        boolean valid = switch (method) {
+            case GCASH, MAYA   -> ref.matches("^[0-9]{13}$");
+            case BANK_TRANSFER -> ref.matches("^[a-zA-Z0-9]{6,20}$");
+            default            -> true;
+        };
+
+        if (!valid) throw new InvalidPaymentException(switch (method) {
+            case GCASH, MAYA   -> "Reference number must be exactly 13 digits";
+            case BANK_TRANSFER -> "Reference must be 6-20 alphanumeric characters";
+            default            -> "Invalid reference number";
+        });
+
         return ref;
     }
 
-    public PaymentResponseDTO mapToPaymentResponseDTO(Payment payment){
+    public PaymentResponseDTO mapToPaymentResponseDTO(Payment payment) {
         return new PaymentResponseDTO(
             payment.getId(),
             payment.getPaidAt() != null,
