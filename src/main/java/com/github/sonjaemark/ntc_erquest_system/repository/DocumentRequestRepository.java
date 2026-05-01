@@ -13,10 +13,12 @@ public interface DocumentRequestRepository extends JpaRepository<DocumentRequest
     List<DocumentRequest> findByStatus(RequestStatus status);
     List<DocumentRequest> findByRegistrarId(Long registrarId);
 
-    // Finds requests by document type, student ID, and a hardcoded "Pending" status logic
     List<DocumentRequest> findByDocumentTypeAndStudentIdAndStatus(
         DocumentType documentType, 
         Long studentId, 
         RequestStatus status
     );
+
+    boolean existsByStudentIdAndStatusIn(Long studentId, List<RequestStatus> statuses);
 }
+   
