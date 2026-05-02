@@ -1,34 +1,29 @@
 package com.github.sonjaemark.ntc_erquest_system.service.document;
 
-
-
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundException;
+import com.github.sonjaemark.ntc_erquest_system.exception.IdNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
+import com.github.sonjaemark.ntc_erquest_system.model.UserModel;
+import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthLevel;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequestLogsService;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public abstract class AbstractDocumentRequestService extends AuthLevel {
 
-@Data
-@EqualsAndHashCode(callSuper=true)
-public abstract class AbstractDocumentRequestService extends AuthLevel{
-
-    private DocumentRequestRequestDTO documentRequestDTO;
     protected final UserModelRepository userModelRepository;
     protected final DocumentRepository documentRepository;
     protected final AbstractRequestLogsService requestLogsService;
 
-    // Constructor for sub-classes to pass the repository up
     protected AbstractDocumentRequestService(
-        UserModelRepository userModelRepository,
-        DocumentRepository documentRepository,
-        AuthService authService,
-        AbstractRequestLogsService requestLogsService
+            UserModelRepository userModelRepository,
+            DocumentRepository documentRepository,
+            AuthService authService,
+            AbstractRequestLogsService requestLogsService
     ) {
         super(authService);
         this.userModelRepository = userModelRepository;
@@ -36,43 +31,51 @@ public abstract class AbstractDocumentRequestService extends AuthLevel{
         this.requestLogsService = requestLogsService;
     }
 
-    public boolean logAction() {
-        requestLogsService.logAction();
+    protected boolean logAction(DocumentRequest documentRequest, String remarks) {
+        requestLogsService.logAction(documentRequest, remarks);
         return true;
     }
 
-    // Inside AbstractDocumentRequestService
-    public DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO dto) {
+    protected DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO documentRequestDTO) {
+        UserModel student = userModelRepository.findById(documentRequestDTO.studentId())
+                .orElseThrow(() -> new IdNotFoundException("Student not found with ID: " + documentRequestDTO.studentId()));
+
+        Document document = documentRepository.findById(documentRequestDTO.documentId())
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found with ID: " + documentRequestDTO.documentId()));
+
         return DocumentRequest.builder()
-            .purpose(dto.purpose())
-            .documentType(dto.documentType())
-            .additionalDetails(dto.additionalDetails())
-            .remarks(dto.remarks())
-            .status(dto.status())
-            .student(userModelRepository.findById(dto.studentId()).orElse(null))
-            .document(documentRepository.findById(dto.documentId()).orElse(null)) 
-            .build();
+                .purpose(documentRequestDTO.purpose())
+                .documentType(documentRequestDTO.documentType())
+                .additionalDetails(documentRequestDTO.additionalDetails())
+                .remarks(documentRequestDTO.remarks())
+                .status(documentRequestDTO.status())
+                .student(student)
+                .document(document)
+                .build();
     }
 
-    public DocumentRequestResponseDTO mapToDocumentResponseDTO(DocumentRequest entity) {
+    protected DocumentRequestResponseDTO mapToDocumentResponseDTO(DocumentRequest documentRequest) {
         return new DocumentRequestResponseDTO(
-            entity.getId(),
-            entity.getPurpose(),
-            entity.getDocumentType(),
-            entity.getDocument() != null ? entity.getDocument().getId() : null,
-            entity.getAdditionalDetails(),
-            entity.getRemarks(),
-            entity.getStatus(),
-            entity.getRequestedAt(),
-            entity.getUpdatedAt(),
-            entity.getStudent() != null ? entity.getStudent().getId() : null,
-            entity.getStudent() != null ? 
-                entity.getStudent().getFirstName() + " " + entity.getStudent().getLastName() : "Unknown",
-            entity.getRegistrar() != null ? entity.getRegistrar().getId() : null
+                documentRequest.getId(),
+                documentRequest.getPurpose(),
+                documentRequest.getDocumentType(),
+                documentRequest.getDocument() != null ? documentRequest.getDocument().getId() : null,
+                documentRequest.getAdditionalDetails(),
+                documentRequest.getRemarks(),
+                documentRequest.getStatus(),
+                documentRequest.getRequestedAt(),
+                documentRequest.getUpdatedAt(),
+                documentRequest.getStudent() != null ? documentRequest.getStudent().getId() : null,
+                documentRequest.getStudent() != null
+                        ? documentRequest.getStudent().getFirstName() + " " + documentRequest.getStudent().getLastName()
+                        : "Unknown",
+                documentRequest.getRegistrar() != null ? documentRequest.getRegistrar().getId() : null
         );
     }
 
-    public abstract DocumentRequestResponseDTO submit();
-    public abstract DocumentRequestResponseDTO process();
-    public abstract DocumentRequestResponseDTO accept();
+    public abstract DocumentRequestResponseDTO submit(DocumentRequestRequestDTO dto);
+
+    public abstract DocumentRequestResponseDTO process(DocumentRequestRequestDTO dto);
+
+    public abstract DocumentRequestResponseDTO accept(DocumentRequestRequestDTO dto);
 }

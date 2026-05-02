@@ -7,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
-import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsRequestDTO;
-import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
-import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
@@ -20,8 +17,6 @@ import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 import com.github.sonjaemark.ntc_erquest_system.service.requestLogs.AbstractRequestLogsService;
 
-
-
 @Service
 @Transactional
 public class ConcreteDocumentRequestService extends AbstractDocumentRequestService implements IDocumentRequestQueryService{
@@ -29,116 +24,91 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     private final DocumentRequestRepository documentRequestRepository;
 
     public ConcreteDocumentRequestService(
-            DocumentRequestRepository documentRequestRepository, 
+            DocumentRequestRepository documentRequestRepository,
             UserModelRepository userModelRepository,
             DocumentRepository documentRepository,
             AuthService authService,
-            AbstractRequestLogsService requestLogsService) {
-        super(userModelRepository, documentRepository, authService, requestLogsService); // Pass to Abstract class
+            AbstractRequestLogsService requestLogsService
+    ) {
+        super(userModelRepository, documentRepository, authService, requestLogsService);
         this.documentRequestRepository = documentRequestRepository;
-        
     }
 
     @Override
-    public DocumentRequestResponseDTO submit() {
-        Long id = isAuthorized(List.of(UserRole.STUDENT));
-    
-        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
+    public DocumentRequestResponseDTO submit(DocumentRequestRequestDTO documentRequestDTO) {
+        System.out.println("DEBUG: Submit request received: " + documentRequestDTO);
+        isAuthorized(List.of(UserRole.STUDENT));
 
-        List<DocumentRequest> docRec = 
-            documentRequestRepository
-            .findByDocumentTypeAndStudentIdAndStatus(
-            documentRequestDTO.documentType(), 
-            id, 
-            RequestStatus.PENDING
+        boolean hasActiveRequest = documentRequestRepository.existsByStudentIdAndStatusIn(
+            documentRequestDTO.studentId(),
+            List.of(
+                RequestStatus.PENDING,
+                RequestStatus.PROCESSING,
+                RequestStatus.READY_FOR_RELEASE
+            )
         );
 
-        List<Document> studentsAvailableDocs = documentRepository.findAllByStudentId(id);
-
-        if (studentsAvailableDocs.stream().noneMatch(
-                doc -> doc.getDocumentType().equals(documentRequestDTO.documentType())
-            )) {
-            throw new DocumentNotFoundException("Cannot process document request, document not available");
+        if (hasActiveRequest) {
+            throw new DocumentRequestAlreadyExistException(
+                "You already have an active request. Please wait until your current document is claimed or released before submitting another request."
+            );
         }
-
-        if(docRec.stream().findAny().isPresent()) {
-            throw new DocumentRequestAlreadyExistException("Cannot proccess document request, request on this document exist and on PENDDING");
-        }
-        
 
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
-        documentRequest.setStudent(userModelRepository.findById(id).orElseThrow());
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
-
-        requestLogsService.setRequestLogsRequestDTO(
-            new RequestLogsRequestDTO(savedDocumentRequest.getId(), savedDocumentRequest.getStatus(), savedDocumentRequest.getRemarks())
-        );
-        
-        logAction();  // logging document request status
+        logAction(savedDocumentRequest, "Student submitted a document request for " + savedDocumentRequest.getDocumentType());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
 
     @Override
-    public DocumentRequestResponseDTO process() {
+    public DocumentRequestResponseDTO process(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
-        
 
-        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
 
-        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        requestLogsService.setRequestLogsRequestDTO(
-            new RequestLogsRequestDTO(savedDocumentRequest.getId(), savedDocumentRequest.getStatus(), savedDocumentRequest.getRemarks())
-        );
-        
-        logAction();  // logging document request status
+        logAction(savedDocumentRequest, "Registrar updated the request status to " + savedDocumentRequest.getStatus());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
 
     @Override
-    public DocumentRequestResponseDTO accept() {
+    public DocumentRequestResponseDTO accept(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
 
-        DocumentRequestRequestDTO documentRequestDTO = getDocumentRequestDTO();
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
-
         documentRequest.setStatus(RequestStatus.PROCESSING);
 
-        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);  // saving document request
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        requestLogsService.setRequestLogsRequestDTO(
-            new RequestLogsRequestDTO(savedDocumentRequest.getId(), RequestStatus.PROCESSING, savedDocumentRequest.getRemarks())
-        );
-        
-        logAction();  // logging document request status
+        logAction(savedDocumentRequest, "Registrar accepted the request");
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
 
-    public List<DocumentRequestResponseDTO> getAllDocumentRequestByStudentId() {
-        Long studentId = isAuthorized(List.of(UserRole.STUDENT));
+    public List<DocumentRequestResponseDTO> getAllByStudentId(Long studentId) {
+        isAuthorized(List.of(UserRole.STUDENT));
 
-        return documentRequestRepository.findByStudentId(studentId) // Get the list of entities
-            .stream()                                               // Open a stream
-            .map(this::mapToDocumentResponseDTO)                    // Convert each entity to DTO
-            .toList();                                              // Collect back into a List
+        return documentRequestRepository.findByStudentId(studentId)
+            .stream()
+            .map(this::mapToDocumentResponseDTO)
+            .toList();
     }
 
     public List<DocumentRequestResponseDTO> getAllUnacceptedRequest() {
-        isAuthorized(List.of(UserRole.REGISTRAR)); 
+        isAuthorized(List.of(UserRole.REGISTRAR));
 
-        return documentRequestRepository.findByStatus(RequestStatus.PENDING)    // Get all Request with PENDING status
-            .stream()                                                           // Open a stream
-            .map(this::mapToDocumentResponseDTO)                                // Convert each entity to DTO
-            .toList();                                                          // Collect back into a List
+        return documentRequestRepository.findByStatus(RequestStatus.PENDING)
+            .stream()
+            .map(this::mapToDocumentResponseDTO)
+            .toList();
     }
 
-    public List<DocumentRequestResponseDTO> getAllAceptedRequestByRegistrarId() {
-        Long registrarId = isAuthorized(List.of(UserRole.REGISTRAR)); 
+    public List<DocumentRequestResponseDTO> getAllByRegistrarId(Long registrarId) {
+        isAuthorized(List.of(UserRole.REGISTRAR));
 
         return documentRequestRepository.findByRegistrarId(registrarId)
             .stream()
@@ -146,4 +116,15 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             .toList();
     }
 
+    @Override
+    public List<DocumentRequestResponseDTO> getAllDocumentRequestByStudentId() {
+        Long id = isAuthorized(List.of(UserRole.STUDENT));
+        return getAllByStudentId(id);
+    }
+
+    @Override
+    public List<DocumentRequestResponseDTO> getAllAceptedRequestByRegistrarId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllAceptedRequestByRegistrarId'");
+    }
 }

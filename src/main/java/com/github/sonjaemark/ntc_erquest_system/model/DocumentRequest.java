@@ -61,6 +61,7 @@ public class DocumentRequest {
     private UserModel student;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registrar_id", nullable = true)
     private UserModel registrar;
 
     @PrePersist
