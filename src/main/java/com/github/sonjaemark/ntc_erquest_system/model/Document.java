@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "document_table")
 @Data
@@ -28,6 +27,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document {
+
+    private static final double DEFAULT_AMOUNT = 120.00;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -36,6 +38,8 @@ public class Document {
 
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
+
+    private double amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
@@ -46,5 +50,9 @@ public class Document {
     @PrePersist
     void onCreate() {
         this.uploadedAt = LocalDateTime.now();
+
+        if (this.amount <= 0) {
+            this.amount = DEFAULT_AMOUNT;
+        }
     }
 }

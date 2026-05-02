@@ -17,8 +17,6 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class ConcretePaymentService extends AbstractPaymentService {
 
-    private static final double DOCUMENT_PRICE = 120.00;
-
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
 
@@ -34,13 +32,18 @@ public class ConcretePaymentService extends AbstractPaymentService {
 
     @Override 
     public PaymentResponseDTO pay() {
-        isAuthorized(List.of(UserRole.STUDENT));
+    isAuthorized(List.of(UserRole.STUDENT));
 
-        Payment payment = paymentMapper.mapToPayment(getPaymentRequestDTO());
-        payment.setAmount(DOCUMENT_PRICE);
+    Payment payment = paymentMapper.mapToPayment(getPaymentRequestDTO());
 
-        return save(payment);
-    }
+    payment.setAmount(
+        payment.getDocumentrequest()
+            .getDocument()
+            .getAmount()
+    );
+
+    return save(payment);
+}
 
     @Override
     public PaymentResponseDTO validatePayment(Long paymentId) {
