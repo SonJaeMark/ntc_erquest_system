@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestInvalidStatusException;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
@@ -103,6 +104,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         return documentRequestRepository.findByStatus(RequestStatus.PENDING)
             .stream()
+            .filter(request -> request.getRegistrar() == null && !request.getStatus().equals(RequestStatus.CANCELLED))
             .map(this::mapToDocumentResponseDTO)
             .toList();
     }
@@ -126,5 +128,25 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     public List<DocumentRequestResponseDTO> getAllAceptedRequestByRegistrarId() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllAceptedRequestByRegistrarId'");
+    }
+
+    @Override
+    public DocumentRequestResponseDTO cancelRequest(Long documentRequestId){
+        isAuthorized(List.of(UserRole.STUDENT));
+
+        DocumentRequest documentRequest = documentRequestRepository
+            .findById(documentRequestId)
+            .orElseThrow(() -> new DocumentRequestInvalidStatusException("Document request not found"));
+
+        if (!documentRequest.getStatus().equals(RequestStatus.PENDING)) {
+            throw new DocumentRequestInvalidStatusException("Only pending requests can be cancelled");
+        }
+        documentRequest.setStatus(RequestStatus.CANCELLED);
+
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
+
+        logAction(savedDocumentRequest, "Student cancelled the request");
+
+        return mapToDocumentResponseDTO(savedDocumentRequest);
     }
 }

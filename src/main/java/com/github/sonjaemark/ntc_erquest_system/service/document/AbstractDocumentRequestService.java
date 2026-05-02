@@ -78,4 +78,6 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
     public abstract DocumentRequestResponseDTO process(DocumentRequestRequestDTO dto);
 
     public abstract DocumentRequestResponseDTO accept(DocumentRequestRequestDTO dto);
+
+    public abstract DocumentRequestResponseDTO cancelRequest(Long documentRequestId);
 }
