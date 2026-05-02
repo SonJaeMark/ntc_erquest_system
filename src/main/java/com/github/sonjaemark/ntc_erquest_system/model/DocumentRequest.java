@@ -68,7 +68,9 @@ public class DocumentRequest {
         LocalDateTime now = LocalDateTime.now();
         this.requestedAt = now;
         this.updatedAt = now;
-        this.status = RequestStatus.PENDING;
+        if (this.status == null) {
+            this.status = RequestStatus.PENDING;
+        }
     }
 
     @PreUpdate
