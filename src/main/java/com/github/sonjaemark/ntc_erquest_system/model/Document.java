@@ -39,7 +39,8 @@ public class Document {
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
 
-    private double amount;
+    @Builder.Default
+    private double amount = DEFAULT_AMOUNT;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
@@ -49,10 +50,12 @@ public class Document {
 
     @PrePersist
     void onCreate() {
-        this.uploadedAt = LocalDateTime.now();
+        if (uploadedAt == null) {
+            uploadedAt = LocalDateTime.now();
+        }
 
-        if (this.amount <= 0) {
-            this.amount = DEFAULT_AMOUNT;
+        if (amount <= 0) {
+            amount = DEFAULT_AMOUNT;
         }
     }
 }
