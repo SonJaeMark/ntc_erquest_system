@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestInvalidStatusException;
+import com.github.sonjaemark.ntc_erquest_system.exception.IdNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
@@ -40,8 +41,12 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         System.out.println("DEBUG: Submit request received: " + documentRequestDTO);
         isAuthorized(List.of(UserRole.STUDENT));
 
+        // For new submissions, ensure ID is null to prevent accidental updates
+        DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
+        documentRequest.setId(null);
+
         boolean hasActiveRequest = documentRequestRepository.existsByStudentIdAndStatusIn(
-            documentRequestDTO.studentId(),
+            documentRequest.getStudent().getId(),
             List.of(
                 RequestStatus.PENDING,
                 RequestStatus.PROCESSING,
@@ -55,7 +60,6 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             );
         }
 
-        DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
         logAction(savedDocumentRequest, "Student submitted a document request for " + savedDocumentRequest.getDocumentType());
@@ -67,8 +71,11 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     public DocumentRequestResponseDTO process(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
 
-        DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
+        if (documentRequestDTO.id() == null) {
+            throw new IdNotFoundException("Document Request ID is required for processing");
+        }
 
+        DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
         logAction(savedDocumentRequest, "Registrar updated the request status to " + savedDocumentRequest.getStatus());
@@ -79,6 +86,10 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     @Override
     public DocumentRequestResponseDTO accept(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
+
+        if (documentRequestDTO.id() == null) {
+            throw new IdNotFoundException("Document Request ID is required for acceptance");
+        }
 
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
         documentRequest.setStatus(RequestStatus.PROCESSING);

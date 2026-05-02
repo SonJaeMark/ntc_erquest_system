@@ -38,12 +38,19 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
 
     protected DocumentRequest mapToDocumentRequest(DocumentRequestRequestDTO documentRequestDTO) {
         UserModel student = userModelRepository.findById(documentRequestDTO.studentId())
-                .orElseThrow(() -> new IdNotFoundException("Student not found with ID: " + documentRequestDTO.studentId()));
+                .orElseThrow(() -> new IdNotFoundException("Student findByEmail with ID: " + documentRequestDTO.studentId()));
 
         Document document = documentRepository.findById(documentRequestDTO.documentId())
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found with ID: " + documentRequestDTO.documentId()));
 
+        UserModel registrar = null;
+        if (documentRequestDTO.registrarId() != null) {
+            registrar = userModelRepository.findById(documentRequestDTO.registrarId())
+                    .orElseThrow(() -> new IdNotFoundException("Registrar not found with ID: " + documentRequestDTO.registrarId()));
+        }
+
         return DocumentRequest.builder()
+                .id(documentRequestDTO.id())
                 .purpose(documentRequestDTO.purpose())
                 .documentType(documentRequestDTO.documentType())
                 .additionalDetails(documentRequestDTO.additionalDetails())
@@ -51,6 +58,7 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
                 .status(documentRequestDTO.status())
                 .student(student)
                 .document(document)
+                .registrar(registrar)
                 .build();
     }
 
