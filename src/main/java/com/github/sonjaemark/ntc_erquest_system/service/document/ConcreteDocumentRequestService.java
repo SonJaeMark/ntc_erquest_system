@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestInvalidStatusException;
-import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestInvalidStatusException;
 import com.github.sonjaemark.ntc_erquest_system.exception.DocumentRequestAlreadyExistException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
@@ -105,6 +104,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         return documentRequestRepository.findByStatus(RequestStatus.PENDING)
             .stream()
+            .filter(request -> request.getRegistrar() == null && !request.getStatus().equals(RequestStatus.CANCELLED))
             .map(this::mapToDocumentResponseDTO)
             .toList();
     }
