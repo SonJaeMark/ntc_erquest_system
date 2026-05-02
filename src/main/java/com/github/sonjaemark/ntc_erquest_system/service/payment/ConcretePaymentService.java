@@ -10,16 +10,23 @@ import com.github.sonjaemark.ntc_erquest_system.model.Payment;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.PaymentRepository;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
+
 import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
 public class ConcretePaymentService extends AbstractPaymentService {
 
+    private static final double DOCUMENT_PRICE = 120.00;
+
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
 
-    public ConcretePaymentService(AuthService authService, PaymentRepository paymentRepository, PaymentMapper paymentMapper) {
+    public ConcretePaymentService(
+            AuthService authService,
+            PaymentRepository paymentRepository,
+            PaymentMapper paymentMapper
+    ) {
         super(authService);
         this.paymentRepository = paymentRepository;
         this.paymentMapper = paymentMapper;
@@ -28,13 +35,30 @@ public class ConcretePaymentService extends AbstractPaymentService {
     @Override 
     public PaymentResponseDTO pay() {
         isAuthorized(List.of(UserRole.STUDENT));
-        return save(paymentMapper.mapToPayment(getPaymentRequestDTO()));
+
+        Payment payment = paymentMapper.mapToPayment(getPaymentRequestDTO());
+        payment.setAmount(DOCUMENT_PRICE);
+
+        return save(payment);
     }
 
     @Override
     public PaymentResponseDTO validatePayment(Long paymentId) {
         isAuthorized(List.of(UserRole.REGISTRAR));
-        return save(paymentRepository.findById(paymentId).orElseThrow(), p -> p.setValidated(true));
+
+        return save(
+                paymentRepository.findById(paymentId).orElseThrow(),
+                payment -> payment.setValidated(true)
+        );
+    }
+
+    public List<PaymentResponseDTO> listPendingPayments() {
+        isAuthorized(List.of(UserRole.REGISTRAR));
+
+        return paymentRepository.findByValidatedIsNullOrValidatedIsFalse()
+                .stream()
+                .map(paymentMapper::mapToPaymentResponseDTO)
+                .toList();
     }
 
     private PaymentResponseDTO save(Payment payment) {
@@ -48,13 +72,5 @@ public class ConcretePaymentService extends AbstractPaymentService {
 
     private PaymentResponseDTO mapToResponse(Payment payment) {
         return paymentMapper.mapToPaymentResponseDTO(payment);
-    }
-
-    public List<PaymentResponseDTO> listPendingPayments() {
-    isAuthorized(List.of(UserRole.REGISTRAR));
-    return paymentRepository.findByValidatedIsNullOrValidatedIsFalse()
-        .stream()
-        .map(paymentMapper::mapToPaymentResponseDTO)
-        .toList();
     }
 }

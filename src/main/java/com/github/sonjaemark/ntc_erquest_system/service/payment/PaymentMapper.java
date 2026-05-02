@@ -13,35 +13,48 @@ import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRequestReposi
 
 @Component
 public class PaymentMapper {
-    
+
     private final DocumentRequestRepository documentRequestRepository;
 
-    public PaymentMapper(DocumentRequestRepository documentRequestRepository){
+    public PaymentMapper(DocumentRequestRepository documentRequestRepository) {
         this.documentRequestRepository = documentRequestRepository;
     }
 
-    public Payment mapToPayment(PaymentRequestDTO dto){
-        String ref = dto.paymentMethod() == PaymentMethod.CASH 
-            ? UUID.randomUUID().toString()
-            : validateReference(dto.referenceNumber(), dto.paymentMethod());
+    public Payment mapToPayment(PaymentRequestDTO dto) {
+        String referenceNumber = getReferenceNumber(dto);
 
         return Payment.builder()
-            .amount(dto.amount())
             .validated(false)
             .paymentMethod(dto.paymentMethod())
-            .referenceNumber(ref)
+            .referenceNumber(referenceNumber)
             .documentrequest(documentRequestRepository.findById(dto.documentRequestId()).orElseThrow())
             .build();
     }
 
-    private String validateReference(String ref, PaymentMethod method) {
-        if (ref == null || ref.isBlank() || !ref.matches("^[a-zA-Z0-9\\-]+$")) {
-            throw new InvalidPaymentException(method + " payment requires a valid reference number");
+    private String getReferenceNumber(PaymentRequestDTO dto) {
+        if (dto.paymentMethod() == PaymentMethod.CASH) {
+            return "CASH-" + UUID.randomUUID()
+                .toString()
+                .substring(0, 8)
+                .toUpperCase();
         }
-        return ref;
+
+        return validateReference(dto.referenceNumber(), dto.paymentMethod());
     }
 
-    public PaymentResponseDTO mapToPaymentResponseDTO(Payment payment){
+    private String validateReference(String referenceNumber, PaymentMethod method) {
+        if (referenceNumber == null || referenceNumber.isBlank()) {
+            throw new InvalidPaymentException(method + " payment requires a reference number");
+        }
+
+        if (!referenceNumber.matches("^[a-zA-Z0-9\\-]+$")) {
+            throw new InvalidPaymentException("Reference number can only contain letters, numbers, and dash");
+        }
+
+        return referenceNumber.trim().toUpperCase();
+    }
+
+    public PaymentResponseDTO mapToPaymentResponseDTO(Payment payment) {
         return new PaymentResponseDTO(
             payment.getId(),
             payment.getPaidAt() != null,
