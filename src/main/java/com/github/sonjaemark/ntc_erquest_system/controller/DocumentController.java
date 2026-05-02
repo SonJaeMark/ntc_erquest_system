@@ -13,7 +13,6 @@ import com.github.sonjaemark.ntc_erquest_system.service.document.AbstractDocumen
 @RestController
 @RequestMapping("/api/document")
 public class DocumentController {
-    // List<DocumentResponseDTO> getStudentsDocuments
 
     private final AbstractDocumentService documentService;
 
