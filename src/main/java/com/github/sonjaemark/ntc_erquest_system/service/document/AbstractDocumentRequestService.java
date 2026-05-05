@@ -6,6 +6,7 @@ import com.github.sonjaemark.ntc_erquest_system.exception.DocumentNotFoundExcept
 import com.github.sonjaemark.ntc_erquest_system.exception.IdNotFoundException;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.UserModel;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
@@ -31,8 +32,8 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
         this.requestLogsService = requestLogsService;
     }
 
-    protected boolean logAction(DocumentRequest documentRequest, String remarks) {
-        requestLogsService.logAction(documentRequest, remarks);
+    protected boolean logAction(DocumentRequest documentRequest, String remarks, RequestStatus requestStatus) {
+        requestLogsService.logAction(documentRequest, remarks, requestStatus);
         return true;
     }
 

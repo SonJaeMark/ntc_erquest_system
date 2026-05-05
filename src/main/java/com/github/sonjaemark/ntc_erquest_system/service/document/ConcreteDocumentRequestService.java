@@ -49,6 +49,8 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
             documentRequest.getStudent().getId(),
             List.of(
                 RequestStatus.PENDING,
+                RequestStatus.PAID,
+                RequestStatus.VALIDATED,
                 RequestStatus.PROCESSING,
                 RequestStatus.READY_FOR_RELEASE
             )
@@ -62,7 +64,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction(savedDocumentRequest, "Student submitted a document request for " + savedDocumentRequest.getDocumentType());
+        logAction(savedDocumentRequest, "Student submitted a document request for " + savedDocumentRequest.getDocumentType(), savedDocumentRequest.getStatus());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
@@ -78,7 +80,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         DocumentRequest documentRequest = mapToDocumentRequest(documentRequestDTO);
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction(savedDocumentRequest, "Registrar updated the request status to " + savedDocumentRequest.getStatus());
+        logAction(savedDocumentRequest, "Registrar updated the request status to " + savedDocumentRequest.getStatus(), savedDocumentRequest.getStatus());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
@@ -96,7 +98,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction(savedDocumentRequest, "Registrar accepted the request");
+        logAction(savedDocumentRequest, "Registrar accepted the request", savedDocumentRequest.getStatus());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
@@ -113,9 +115,9 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     public List<DocumentRequestResponseDTO> getAllUnacceptedRequest() {
         isAuthorized(List.of(UserRole.REGISTRAR));
 
-        return documentRequestRepository.findByStatus(RequestStatus.PENDING)
+        return documentRequestRepository.findByStatusIn(List.of(RequestStatus.PENDING, RequestStatus.PAID))
             .stream()
-            .filter(request -> request.getRegistrar() == null && !request.getStatus().equals(RequestStatus.CANCELLED))
+            .filter(request -> request.getRegistrar() == null)
             .map(this::mapToDocumentResponseDTO)
             .toList();
     }
@@ -126,6 +128,8 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         return documentRequestRepository.findByRegistrarId(registrarId)
             .stream()
             .filter(request -> 
+                request.getStatus().equals(RequestStatus.PAID) ||
+                request.getStatus().equals(RequestStatus.VALIDATED) ||
                 request.getStatus().equals(RequestStatus.PROCESSING) || 
                 request.getStatus().equals(RequestStatus.READY_FOR_RELEASE) || 
                 request.getStatus().equals(RequestStatus.RELEASED) ||
@@ -162,7 +166,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
         DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
 
-        logAction(savedDocumentRequest, "Student cancelled the request");
+        logAction(savedDocumentRequest, "Student cancelled the request", savedDocumentRequest.getStatus());
 
         return mapToDocumentResponseDTO(savedDocumentRequest);
     }
