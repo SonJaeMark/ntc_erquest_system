@@ -3,6 +3,7 @@ package com.github.sonjaemark.ntc_erquest_system.service.payment;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.PaymentRequestDTO;
@@ -92,5 +93,10 @@ public class ConcretePaymentService extends AbstractPaymentService {
 
     private PaymentResponseDTO mapToResponse(Payment payment) {
         return paymentMapper.mapToPaymentResponseDTO(payment);
+    }
+
+    @Override
+    public  PaymentResponseDTO checkPayment(Long paymentId) {
+        return mapToResponse(paymentRepository.findPaymentByDocumentrequestId(paymentId).orElseThrow(() -> new InvalidPaymentException("Payment not found")));
     }
 }

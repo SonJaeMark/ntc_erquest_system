@@ -6,5 +6,6 @@ public enum RequestStatus {
     READY_FOR_RELEASE,
     RELEASED,
     REJECTED,
+    PAID,
     CANCELLED
 }

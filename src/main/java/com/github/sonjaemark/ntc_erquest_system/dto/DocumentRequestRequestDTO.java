@@ -19,10 +19,8 @@ public record DocumentRequestRequestDTO(
     String additionalDetails,
     @Size(max = 255, message = "Remarks must not exceed 255 characters")
     String remarks,
-    @NotNull(message = "Status is required")
     RequestStatus status,
     @NotNull(message = "Student ID is required")
     Long studentId,
-    @NotNull(message = "Registrar ID is required")
     Long registrarId
 ) {}

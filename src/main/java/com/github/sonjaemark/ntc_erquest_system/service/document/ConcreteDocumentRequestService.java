@@ -121,10 +121,16 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     }
 
     public List<DocumentRequestResponseDTO> getAllByRegistrarId(Long registrarId) {
-        isAuthorized(List.of(UserRole.REGISTRAR));
+        
 
         return documentRequestRepository.findByRegistrarId(registrarId)
             .stream()
+            .filter(request -> 
+                request.getStatus().equals(RequestStatus.PROCESSING) || 
+                request.getStatus().equals(RequestStatus.READY_FOR_RELEASE) || 
+                request.getStatus().equals(RequestStatus.RELEASED) ||
+                request.getStatus().equals(RequestStatus.REJECTED)
+            )
             .map(this::mapToDocumentResponseDTO)
             .toList();
     }
@@ -137,8 +143,8 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
 
     @Override
     public List<DocumentRequestResponseDTO> getAllAceptedRequestByRegistrarId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllAceptedRequestByRegistrarId'");
+        Long id = isAuthorized(List.of(UserRole.REGISTRAR));
+        return getAllByRegistrarId(id);
     }
 
     @Override

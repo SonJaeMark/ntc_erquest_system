@@ -45,6 +45,11 @@ public class DocumentRequestController {
         return ResponseEntity.ok(documentService.accept(dto));
     }
 
+    @PutMapping("/cancel/{documentRequestId}")
+    public ResponseEntity<DocumentRequestResponseDTO> cancel(@PathVariable Long documentRequestId) {
+        return ResponseEntity.ok(documentService.cancelRequest(documentRequestId));
+    }
+
     @GetMapping("/student")
     public ResponseEntity<List<DocumentRequestResponseDTO>> getByStudent() {
         return ResponseEntity.ok(documentQueryService.getAllDocumentRequestByStudentId());
