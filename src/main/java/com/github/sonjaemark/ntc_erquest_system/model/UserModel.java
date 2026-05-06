@@ -2,6 +2,7 @@ package com.github.sonjaemark.ntc_erquest_system.model;
 
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,7 @@ public class UserModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
     private String email;
     private String password;
 
