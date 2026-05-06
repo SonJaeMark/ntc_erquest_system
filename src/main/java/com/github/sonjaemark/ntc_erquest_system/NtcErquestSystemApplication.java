@@ -1,6 +1,9 @@
 package com.github.sonjaemark.ntc_erquest_system;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -44,12 +47,55 @@ public class NtcErquestSystemApplication {
 				new RegisterRequestDTO("student2@email.com", "password123", "password123", "Student", "Two", UserRole.STUDENT),
 				new RegisterRequestDTO("student3@email.com", "password123", "password123", "Student", "Three", UserRole.STUDENT),
 				new RegisterRequestDTO("registrar1@email.com", "password123", "password123", "Registrar", "One", UserRole.REGISTRAR),
-				new RegisterRequestDTO("registrar2@email.com", "password123", "password123", "Registrar", "Two", UserRole.REGISTRAR)
+				new RegisterRequestDTO("registrar2@email.com", "password123", "password123", "Registrar", "Two", UserRole.REGISTRAR),
+				new RegisterRequestDTO("registrar3@email.com", "password123", "password123", "Registrar", "Three", UserRole.REGISTRAR),
+				new RegisterRequestDTO("registrar4@email.com", "password123", "password123", "Registrar", "Four", UserRole.REGISTRAR),
+				new RegisterRequestDTO("studentS1@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS2@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS3@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS4@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS5@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS6@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS7@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS8@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS9@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS10@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS11@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS12@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS13@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS14@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS15@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS16@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS17@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS18@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS19@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT),
+				new RegisterRequestDTO("studentS20@email.com", "password123", "password123", "Student", "Lastname", UserRole.STUDENT)
 			);
 
 			for (RegisterRequestDTO req : usersToRegister) {
 				if (userModelRepository.findByEmail(req.email()).isEmpty()) {
 					authService.register(req);
+				}
+			}
+
+			// Seed 3 random documents for each student from studentS1 to studentS20
+			for (int i = 1; i <= 20; i++) {
+				final int studentIndex = i;
+				String email = "studentS" + studentIndex + "@email.com";
+				Optional<UserModel> studentOpt = userModelRepository.findByEmail(email);
+				if (studentOpt.isPresent()) {
+					UserModel student = studentOpt.get();
+					if (documentRepository.findAllByStudentId(student.getId()).isEmpty()) {
+						List<DocumentType> allTypes = new ArrayList<>(List.of(DocumentType.values()));
+						Collections.shuffle(allTypes);
+						allTypes.stream().limit(3).forEach(type -> 
+							documentRepository.save(Document.builder()
+								.documentType(type)
+								.student(student)
+								.documentContent("content_" + type + "_" + student.getFirstName() + studentIndex)
+								.build())
+						);
+					}
 				}
 			}
 
