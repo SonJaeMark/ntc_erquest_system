@@ -1,6 +1,5 @@
 package com.github.sonjaemark.ntc_erquest_system.service.requestLogs;
 
-import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.RequestLogs;
@@ -14,24 +13,19 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public abstract class AbstractRequestLogsService extends AuthLevel {
 
-    private RequestLogsRequestDTO requestLogsRequestDTO;
-
     protected AbstractRequestLogsService(AuthService authService) {
         super(authService);
     }
 
-    public RequestLogs mapToRequestLogs(RequestLogsRequestDTO requestLogsRequestDTO) {
-        if (requestLogsRequestDTO == null) {
+    public RequestLogs mapToRequestLogs(DocumentRequest documentRequest, String remarks) {
+        if (documentRequest == null) {
             return null;
         }
 
         return RequestLogs.builder()
-                .documentRequest(DocumentRequest.builder()
-                    .id(requestLogsRequestDTO.documentRequestId())
-                    .build())
-                .requestStatus(requestLogsRequestDTO.requestStatus())
-                .remarks(requestLogsRequestDTO.remarks())
-                // dateAction is usually handled by @PrePersist or manual setting in service
+                .documentRequest(documentRequest)
+                .requestStatus(documentRequest.getStatus())
+                .remarks(remarks)
                 .build();
     }
 
@@ -45,10 +39,8 @@ public abstract class AbstractRequestLogsService extends AuthLevel {
                 requestLogs.getRequestStatus(),
                 requestLogs.getDateAction(),
                 requestLogs.getRemarks()
-    );
-}
-   
-    
-    public abstract RequestLogsResponseDTO logAction();
+        );
+    }
 
+    public abstract RequestLogsResponseDTO logAction(DocumentRequest documentRequest, String remarks);
 }

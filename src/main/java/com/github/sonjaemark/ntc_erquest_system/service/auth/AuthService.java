@@ -147,16 +147,16 @@ public class AuthService {
 
     public AuthResponseDTO logout(LogoutRequestDTO token) {
 
-        // Validate the provided refresh token and delete it from the database to log the user out
-        RefreshToken refreshToken = refreshTokenRepository
-            .findByToken(token.refreshToken())
-        // If the refresh token is not found, throw an exception that will be handled by GlobalExceptionHandler and return a 400 Bad Request response to the client
-        .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+        // If refresh token is provided, try to invalidate it
+        if (token.refreshToken() != null && !token.refreshToken().isEmpty()) {
+            refreshTokenRepository.findByToken(token.refreshToken())
+                .ifPresent(refreshToken -> refreshTokenRepository.delete(refreshToken));
+        }
 
-        // Delete the refresh token from the database to log the user out
-        refreshTokenRepository.delete(refreshToken);
-
-        jwtService.blockAccessToken(token.accessToken());
+        // If access token is provided, block it
+        if (token.accessToken() != null && !token.accessToken().isEmpty()) {
+            jwtService.blockAccessToken(token.accessToken());
+        }
 
         return new AuthResponseDTO(
             null,

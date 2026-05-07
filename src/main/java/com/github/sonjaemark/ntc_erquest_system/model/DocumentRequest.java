@@ -15,7 +15,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -49,7 +48,7 @@ public class DocumentRequest {
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "document_id", nullable = false)
     private Document document; 
 
@@ -61,6 +60,7 @@ public class DocumentRequest {
     private UserModel student;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registrar_id", nullable = true)
     private UserModel registrar;
 
     @PrePersist
@@ -68,7 +68,9 @@ public class DocumentRequest {
         LocalDateTime now = LocalDateTime.now();
         this.requestedAt = now;
         this.updatedAt = now;
-        this.status = RequestStatus.PENDING;
+        if (this.status == null) {
+            this.status = RequestStatus.PENDING;
+        }
     }
 
     @PreUpdate

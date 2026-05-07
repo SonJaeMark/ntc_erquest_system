@@ -32,20 +32,17 @@ public class DocumentRequestController {
 
     @PostMapping("/submit")
     public ResponseEntity<DocumentRequestResponseDTO> submit(@RequestBody DocumentRequestRequestDTO dto) {
-        documentService.setDocumentRequestDTO(dto);
-        return ResponseEntity.ok(documentService.submit());
+        return ResponseEntity.ok(documentService.submit(dto));
     }
 
     @PutMapping("/process")
     public ResponseEntity<DocumentRequestResponseDTO> process(@RequestBody DocumentRequestRequestDTO dto) {
-        documentService.setDocumentRequestDTO(dto);
-        return ResponseEntity.ok(documentService.process());
+        return ResponseEntity.ok(documentService.process(dto));
     }
 
     @PutMapping("/accept")
     public ResponseEntity<DocumentRequestResponseDTO> accept(@RequestBody DocumentRequestRequestDTO dto) {
-        documentService.setDocumentRequestDTO(dto);
-        return ResponseEntity.ok(documentService.accept());
+        return ResponseEntity.ok(documentService.accept(dto));
     }
 
     @GetMapping("/student")
@@ -64,7 +61,7 @@ public class DocumentRequestController {
     }
 
     @GetMapping("/logs/{documentRequestId}")
-    public ResponseEntity<List<RequestLogsResponseDTO>> getMethodName(@RequestParam Long documentRequestId) {
+    public ResponseEntity<List<RequestLogsResponseDTO>> getMethodName(@PathVariable Long documentRequestId) {
         return ResponseEntity.ok(requestLogsQueryService.getRequestLogsByDocumentRequestId(documentRequestId));
     }
 

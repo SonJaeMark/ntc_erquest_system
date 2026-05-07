@@ -16,7 +16,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public abstract class AbstractDocumentService extends AuthLevel{
 
-    private DocumentRequestDTO documentRequestDTO;
     private final UserModelRepository userModelRepository;
 
     protected AbstractDocumentService(AuthService authService, UserModelRepository userModelRepository){

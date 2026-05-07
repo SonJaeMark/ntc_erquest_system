@@ -8,12 +8,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record DocumentRequestRequestDTO(
+    Long id,
     @NotNull(message = "Purpose is required")
     Purpose purpose,
     @NotNull(message = "Document type is required")
-    DocumentType documentType, // Added
+    DocumentType documentType,
     @NotNull(message = "Document ID is required")
-    Long documentId,           // Added to link the specific Document entity
+    Long documentId,
     @Size(max = 500, message = "Additional details must not exceed 500 characters")
     String additionalDetails,
     @Size(max = 255, message = "Remarks must not exceed 255 characters")
