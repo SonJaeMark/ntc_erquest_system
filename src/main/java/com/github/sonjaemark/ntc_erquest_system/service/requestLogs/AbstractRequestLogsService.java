@@ -3,6 +3,7 @@ package com.github.sonjaemark.ntc_erquest_system.service.requestLogs;
 import com.github.sonjaemark.ntc_erquest_system.dto.RequestLogsResponseDTO;
 import com.github.sonjaemark.ntc_erquest_system.model.DocumentRequest;
 import com.github.sonjaemark.ntc_erquest_system.model.RequestLogs;
+import com.github.sonjaemark.ntc_erquest_system.model.enums.RequestStatus;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthLevel;
 import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 
@@ -17,14 +18,14 @@ public abstract class AbstractRequestLogsService extends AuthLevel {
         super(authService);
     }
 
-    public RequestLogs mapToRequestLogs(DocumentRequest documentRequest, String remarks) {
+    public RequestLogs mapToRequestLogs(DocumentRequest documentRequest, String remarks, RequestStatus requestStatus) {
         if (documentRequest == null) {
             return null;
         }
 
         return RequestLogs.builder()
                 .documentRequest(documentRequest)
-                .requestStatus(documentRequest.getStatus())
+                .requestStatus(requestStatus)
                 .remarks(remarks)
                 .build();
     }
@@ -42,5 +43,5 @@ public abstract class AbstractRequestLogsService extends AuthLevel {
         );
     }
 
-    public abstract RequestLogsResponseDTO logAction(DocumentRequest documentRequest, String remarks);
+    public abstract RequestLogsResponseDTO logAction(DocumentRequest documentRequest, String remarks, RequestStatus requestStatus);
 }

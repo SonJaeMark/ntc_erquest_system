@@ -202,4 +202,16 @@ public class GlobalExceptionHandler {
                 )
             );
     }
+    @ExceptionHandler(InvalidPaymentException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleInvalidPaymentException(InvalidPaymentException ex) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                new ExceptionResponseDTO(
+                    HttpStatus.BAD_REQUEST,
+                    ex.getMessage(),
+                    LocalDateTime.now()
+                )
+            );
+    }
 }

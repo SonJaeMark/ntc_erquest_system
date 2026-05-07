@@ -7,5 +7,6 @@ public enum RequestStatus {
     RELEASED,
     REJECTED,
     PAID,
+    VALIDATED,
     CANCELLED
 }
