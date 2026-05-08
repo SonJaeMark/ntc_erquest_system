@@ -7,7 +7,8 @@ public record AuthResponseDTO(
     String refreshToken,
     Long userId,
     String email,
-    UserRole role
+    UserRole role,
+    boolean isActive
 ) {
 
 }

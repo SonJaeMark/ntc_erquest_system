@@ -40,6 +40,22 @@ export function getStudentDocuments(token) {
   return apiRequest("/api/document/student", withAuth(token, { method: "GET" }));
 }
 
+/**
+ * Saves a new document for a student.
+ * @param {string} token - JWT access token.
+ * @param {Object} data - DocumentRequestDTO
+ * @param {string} data.documentType - (DocumentType enum)
+ * @param {string} data.documentContent - Content of the document
+ * @param {number} data.studentId - ID of the student
+ * @returns {Promise} - DocumentResponseDTO
+ */
+export function saveStudentDocument(token, data) {
+  return apiRequest("/api/document/save", withAuth(token, {
+    method: "POST",
+    body: JSON.stringify(data)
+  }));
+}
+
 // ==========================================
 // Document Request Endpoints
 // ==========================================

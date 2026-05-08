@@ -9,5 +9,6 @@ public record DocumentResponseDTO(
     DocumentType documentType,
     String documentContent,
     Long studentId,
-    String studentFullName // Flattened for easy UI display
+    String studentFullName, // Flattened for easy UI display
+    Double amount
 ) {}

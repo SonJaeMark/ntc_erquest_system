@@ -78,7 +78,8 @@ public abstract class AbstractDocumentRequestService extends AuthLevel {
                 documentRequest.getStudent() != null
                         ? documentRequest.getStudent().getFirstName() + " " + documentRequest.getStudent().getLastName()
                         : "Unknown",
-                documentRequest.getRegistrar() != null ? documentRequest.getRegistrar().getId() : null
+                documentRequest.getRegistrar() != null ? documentRequest.getRegistrar().getId() : null,
+                documentRequest.getDocument() != null ? documentRequest.getDocument().getAmount() : 120.00
         );
     }
 

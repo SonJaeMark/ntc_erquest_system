@@ -78,8 +78,9 @@ public class AuthService {
             refreshToken,
             user.getId(),
             user.getEmail(),
-            user.getRole()
-        );
+            user.getRole(),
+            user.isActive()
+            );
     }
 
     public RegisterResponseDTO register(RegisterRequestDTO request) {
@@ -141,7 +142,8 @@ public class AuthService {
             refreshTokenStr,
             user.getId(),
             user.getEmail(),
-            user.getRole()
+            user.getRole(),
+            user.isActive()
         );
     }
 
@@ -163,7 +165,8 @@ public class AuthService {
             null,
             null,
             null,
-            null
+            null,
+            false
         );
     }
 

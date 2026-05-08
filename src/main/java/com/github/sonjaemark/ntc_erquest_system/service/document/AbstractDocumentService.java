@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public abstract class AbstractDocumentService extends AuthLevel{
 
-    private final UserModelRepository userModelRepository;
+    protected final UserModelRepository userModelRepository;
 
     protected AbstractDocumentService(AuthService authService, UserModelRepository userModelRepository){
         super(authService);
@@ -41,12 +41,13 @@ public abstract class AbstractDocumentService extends AuthLevel{
             entity.getDocumentContent(),
             entity.getStudent() != null ? entity.getStudent().getId() : null,
             entity.getStudent() != null ? 
-                entity.getStudent().getFirstName() + " " + entity.getStudent().getLastName() : "Unknown"
+                entity.getStudent().getFirstName() + " " + entity.getStudent().getLastName() : "Unknown",
+            entity.getAmount()
         );
     }
 
 
-    public abstract DocumentResponseDTO save();
+    public abstract DocumentResponseDTO save(DocumentRequestDTO documentRequestDTO);
     public abstract List<DocumentResponseDTO> getStudentsDocuments();
 
 }

@@ -17,5 +17,7 @@ public record DocumentRequestResponseDTO(
     LocalDateTime updatedAt,
     Long studentId,
     String studentFullName,
-    Long registrarId
-) {}
+    Long registrarId,
+    Double amount
+)
+{}

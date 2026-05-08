@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.sonjaemark.ntc_erquest_system.dto.DocumentRequestDTO;
 import com.github.sonjaemark.ntc_erquest_system.dto.DocumentResponseDTO;
+import com.github.sonjaemark.ntc_erquest_system.model.Document;
 import com.github.sonjaemark.ntc_erquest_system.model.enums.UserRole;
 import com.github.sonjaemark.ntc_erquest_system.repository.DocumentRepository;
 import com.github.sonjaemark.ntc_erquest_system.repository.UserModelRepository;
@@ -25,9 +27,20 @@ public class ConcreteDocumentService extends AbstractDocumentService{
     }
 
     @Override
-    public DocumentResponseDTO save() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    public DocumentResponseDTO save(DocumentRequestDTO documentRequestDTO) {
+        isAuthorized(List.of(UserRole.ADMIN));
+        DocumentResponseDTO existingDocument = getStudentsDocuments().stream().filter(doc -> doc.documentType() == documentRequestDTO.documentType()).findFirst().orElse(null);
+        if(existingDocument != null){
+            throw new IllegalArgumentException("Document type already exists");
+        }
+        
+        Document document = Document.builder()
+                .documentType(documentRequestDTO.documentType())
+                .student(userModelRepository.findById(documentRequestDTO.studentId()).orElseThrow(() -> new IllegalArgumentException("Student not found")))
+                .documentContent(documentRequestDTO.documentContent())
+                .build();
+        document = documentRepository.save(document);
+        return mapToDocumentResponseDTO(document);
     }
 
     @Override
