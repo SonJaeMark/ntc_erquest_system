@@ -128,12 +128,13 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
         return documentRequestRepository.findByRegistrarId(registrarId)
             .stream()
             .filter(request -> 
-                request.getStatus().equals(RequestStatus.PAID) ||
+                (request.getStatus().equals(RequestStatus.PAID) ||
                 request.getStatus().equals(RequestStatus.VALIDATED) ||
                 request.getStatus().equals(RequestStatus.PROCESSING) || 
                 request.getStatus().equals(RequestStatus.READY_FOR_RELEASE) || 
                 request.getStatus().equals(RequestStatus.RELEASED) ||
-                request.getStatus().equals(RequestStatus.REJECTED)
+                request.getStatus().equals(RequestStatus.REJECTED)) &&
+                userModelRepository.findById(request.getStudent().getId()).orElseThrow().isActive()
             )
             .map(this::mapToDocumentResponseDTO)
             .toList();
