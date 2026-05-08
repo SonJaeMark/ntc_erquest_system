@@ -89,7 +89,7 @@ public class ConcreteDocumentRequestService extends AbstractDocumentRequestServi
     public DocumentRequestResponseDTO accept(DocumentRequestRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.REGISTRAR));
 
-        if (documentRequestDTO.id() == null) {
+        if (documentRequestDTO.id() == null) { 
             throw new IdNotFoundException("Document Request ID is required for acceptance");
         }
 
