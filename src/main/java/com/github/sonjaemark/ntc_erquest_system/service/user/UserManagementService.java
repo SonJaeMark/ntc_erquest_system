@@ -2,6 +2,7 @@ package com.github.sonjaemark.ntc_erquest_system.service.user;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.github.sonjaemark.ntc_erquest_system.dto.LoadAllUserResponseDTO;
@@ -16,17 +17,19 @@ import com.github.sonjaemark.ntc_erquest_system.service.auth.AuthService;
 @Service
 public class UserManagementService extends AuthLevel{
     private final UserModelRepository userModelRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserManagementService(UserModelRepository userModelRepository, AuthService authService){
+    public UserManagementService(UserModelRepository userModelRepository, AuthService authService, PasswordEncoder passwordEncoder){
         super(authService);
         this.userModelRepository = userModelRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO){
 
         UserModel newUser = UserModel.builder()
                 .email(registerRequestDTO.email())
-                .password(registerRequestDTO.password())
+                .password(passwordEncoder.encode(registerRequestDTO.password()))
                 .firstName(registerRequestDTO.firstName())
                 .lastName(registerRequestDTO.lastName())
                 .role(registerRequestDTO.role())

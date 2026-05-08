@@ -29,10 +29,11 @@ public class ConcreteDocumentService extends AbstractDocumentService{
     @Override
     public DocumentResponseDTO save(DocumentRequestDTO documentRequestDTO) {
         isAuthorized(List.of(UserRole.ADMIN));
-        DocumentResponseDTO existingDocument = getStudentsDocuments().stream().filter(doc -> doc.documentType() == documentRequestDTO.documentType()).findFirst().orElse(null);
-        if(existingDocument != null){
-            throw new IllegalArgumentException("Document type already exists");
-        }
+        
+        documentRepository.findByStudentIdAndDocumentType(documentRequestDTO.studentId(), documentRequestDTO.documentType())
+            .ifPresent(doc -> {
+                throw new IllegalArgumentException("Document type already exists for this student");
+            });
         
         Document document = Document.builder()
                 .documentType(documentRequestDTO.documentType())
